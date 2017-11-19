@@ -23,7 +23,7 @@ namespace epode
 namespace method
 {
 
-template<typename Value, unsigned int N>
+template<typename Value, size_t N>
 class Butcher5th : public internal::Fixed<5>
 {
     public:

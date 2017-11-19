@@ -1,0 +1,58 @@
+//
+//
+// File - Epode/ODE:
+//
+//      Simply include all the files to do ODE solving with Epode.
+//
+//
+// License:
+//
+//      This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+//  If a copy of the MPL was not distributed with this file, You can obtain one
+//  at http://mozilla.org/MPL/2.0/.
+//
+//
+
+#ifndef ODE
+#define ODE
+
+//
+// Core Files
+//
+#include "Core"
+#include "Util"
+
+//
+// Solver Methods
+//
+
+//  5th Order
+#include "Butcher5th"
+
+
+//
+// Compositional Triggers
+//
+#include "Triggers"
+
+
+//
+// Integrator Wrapper and associated classes
+//
+#include "Step"
+#include "Integrator"
+
+//
+// Declare Wrapped Integration Methods
+//
+namespace epode
+{
+namespace integrator
+{
+template<typename Value, size_t N>
+using Butcher5th = Integrator<Value, N, method::Butcher5th>;
+} /*namespace integrator*/
+} /*namespace epode*/
+
+#endif // ODE
+

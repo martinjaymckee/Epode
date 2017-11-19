@@ -1,0 +1,141 @@
+//
+//
+// File - Epode/Integrator:
+//
+//      Implementation of the Integrator wrapper class to handle creation of event triggers,
+//  function objects, etc. and to run the integration.
+//
+//
+// License:
+//
+//      This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+//  If a copy of the MPL was not distributed with this file, You can obtain one
+//  at http://mozilla.org/MPL/2.0/.
+//
+//
+
+#ifndef INTEGRATOR
+#define INTEGRATOR
+
+#include <initializer_list>
+#include <vector>
+
+#include "Core"
+#include "Step"
+#include "Triggers"
+
+namespace epode
+{
+namespace internal
+{
+struct IntegratorStatistics
+{
+        IntegratorStatistics() : steps(0), evals(0) {}
+        IntegratorStatistics(const IntegratorStatistics& _other)
+            : steps(_other.steps), evals(_other.evals) {}
+
+        IntegratorStatistics& update(size_t _steps, size_t _evals ) {
+            steps += _steps;
+            evals += _evals;
+            return *this;
+        }
+
+        size_t steps;
+        size_t evals;
+};
+} /*namespace internal*/
+
+template<typename Value, size_t N, template<typename V, size_t N2> class Method>
+class Integrator
+{
+    public:
+        using value_t = Value;
+        using method_t = Method<value_t, N>;
+        using state_t = internal::State<value_t, N>;
+
+    protected:
+        using limits_t = step::StepLimits<value_t>;
+        using stats_t = internal::IntegratorStatistics;
+        using point_t = internal::StepPoint<value_t, state_t, stats_t>;
+        using return_t = std::vector<point_t>;
+
+    public:
+
+        Integrator(value_t _dv0, auto... args) : dv0(_dv0), method(args...) {}
+
+        return_t operator() (auto funcs, value_t v0, std::initializer_list<value_t> _end, auto y0) {
+            auto end = triggers::internal::constructEndTrigger(_end);
+            auto store = [](auto, auto, auto, auto) {return true;};
+            auto limiter = step::internal::constructLimiter<limits_t, value_t>(_end);
+
+            return this->operator ()(
+                internal::Functions(funcs), // Ensure that a single function is wrapped
+                v0, // Initial Integration Variable Value
+                y0, // Initial State Value
+                end, // Integration End Trigger
+                store, // Integration Step Store Trigger
+                limiter
+            );
+        }
+
+        return_t operator() (auto funcs, value_t v0, auto _end, auto y0) {
+            auto end = triggers::internal::constructEndTrigger(_end);
+            auto store = [](auto, auto, auto, auto) {return true;};
+            auto limiter = step::internal::constructLimiter<limits_t, value_t>(_end);
+
+            return this->operator ()(
+                internal::Functions(funcs), // Ensure that a single function is wrapped
+                v0, // Initial Integration Variable Value
+                y0, // Initial State Value
+                end, // Integration End Trigger
+                store, // Integration Step Store Trigger
+                limiter
+            );
+        }
+
+    protected:
+        return_t operator() (auto funcs, value_t v0, state_t y0, auto end, auto store, auto limiter) {
+            return_t results;
+
+            auto stats = stats_t(); // Create inital stats object
+
+            auto dv = dv0;
+            auto f0 = std::get<0>(funcs);
+            auto y = y0;
+            auto v = v0;
+
+            //doMethodInit(method, v0, y0); // If method has an init method, call it.
+
+            auto limits = limiter(dv, v);
+
+            while(!end(dv, v, y, stats, limits)){
+                // Update dv limits and constrain the integration variable step
+                dv = limits.constrain(dv);
+
+                // Do a step of the selected integration method and update the varaibles
+                auto result = method(f0, dv, v, y, limits);
+                v += result.dv;
+                dv = result.dv_next;
+                y = result.y;
+                stats.update(1, result.evals);
+
+                // Store the results of the step, if desired
+                if(store(result.dv, v, y, stats)){
+                    results.emplace_back(result.dv, v, y, stats);
+                }
+
+                // Update dv limits
+                limits = limiter(dv, v);
+            }
+
+            return results;
+        }
+
+        value_t dv0;
+        method_t method;
+};
+
+} /*namespace epode*/
+
+#endif // INTEGRATOR
+

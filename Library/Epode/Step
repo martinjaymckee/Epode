@@ -1,0 +1,54 @@
+//
+//
+// File - Epode/Step:
+//
+//      Data types and functions to handle single steps of the integration variable.
+//
+//
+// License:
+//
+//      This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+//  If a copy of the MPL was not distributed with this file, You can obtain one
+//  at http://mozilla.org/MPL/2.0/.
+//
+//
+
+#ifndef STEP
+#define STEP
+
+namespace epode
+{
+namespace step
+{
+
+template<typename Value>
+struct StepLimits
+{
+        using value_t = Value;
+
+        StepLimits(const value_t& _max = value_t(1e6), const value_t& _min = value_t(1e-6))
+            : max(_max), min(_min) {}
+
+        constexpr value_t constrain(const value_t& dv) const {
+            if(dv > max) return max;
+            if(dv < min) return min;
+            return dv;
+        }
+
+        value_t max;
+        value_t min;
+};
+
+namespace internal
+{
+template<typename LimitsType, typename Value>
+auto constructLimiter(auto v1) {
+    return [=](auto, auto v) {return LimitsType(v1-v); };
+}
+
+} /*namespace internal*/
+} /*namespace step*/
+} /*namespace epode*/
+
+#endif // STEP
+
