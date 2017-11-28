@@ -17,6 +17,7 @@
 #ifndef INTEGRATOR
 #define INTEGRATOR
 
+#include <iostream>
 #include <initializer_list>
 #include <vector>
 
@@ -94,26 +95,42 @@ class Integrator
         }
 
     protected:
+        //
+        // These overloads determine if the integration method object has an init member function
+        //  and, if so, it calls it.
+        //
+        template<typename V, typename S, typename... Ts>
+        void initMethod(V, V, S, Ts...) {}
+
+        template<typename V, typename S>
+        auto initMethod(V dv, V v, S y, auto _method)
+        -> decltype(_method.init(dv, v, y)) {
+            return _method.init(dv, v, y);
+        }
+
+        //
+        // The generic call operator which contains the implementaion.
+        //
         return_t operator() (auto funcs, value_t v0, state_t y0, auto end, auto store, auto limiter) {
             return_t results;
 
-            auto stats = stats_t(); // Create inital stats object
+            auto stats = stats_t(); // Create inital statistics object
 
             auto dv = dv0;
             auto f0 = std::get<0>(funcs);
             auto y = y0;
             auto v = v0;
 
-            //doMethodInit(method, v0, y0); // If method has an init method, call it.
+            initMethod(dv, v, y, method);
 
             auto limits = limiter(dv, v);
 
             while(!end(dv, v, y, stats, limits)){
-                // Update dv limits and constrain the integration variable step
+                // Always constrain the integration variable step
                 dv = limits.constrain(dv);
 
-                // Do a step of the selected integration method and update the varaibles
-                auto result = method(f0, dv, v, y, limits);
+                // Do a step of the selected integration method and update the integration state
+                const auto result = method(f0, dv, v, y, limits);
                 v += result.dv;
                 dv = result.dv_next;
                 y = result.y;
@@ -124,15 +141,18 @@ class Integrator
                     results.emplace_back(result.dv, v, y, stats);
                 }
 
-                // Update dv limits
+                // Update the integration variable limits
                 limits = limiter(dv, v);
             }
 
             return results;
         }
 
-        value_t dv0;
-        method_t method;
+        //
+        // Integrator data members
+        //
+        value_t dv0; // Initial step size... is this the best way to do this for all methods?
+        method_t method; // The method object which will be used in calculations
 };
 
 } /*namespace epode*/

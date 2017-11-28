@@ -25,7 +25,8 @@ HEADERS += \
     Epode/Integrator \
     Epode/ODE \
     Epode/Triggers \
-    Epode/Step
+    Epode/Step \
+    Epode/RK2
 
 DISTFILES += \
     ../../Tests/C++/ODE_Integration/Epode/MPL_2_0.txt \

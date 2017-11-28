@@ -26,6 +26,9 @@
 // Solver Methods
 //
 
+//  2nd Order
+#include "RK2"
+
 //  5th Order
 #include "Butcher5th"
 
@@ -49,6 +52,20 @@ namespace epode
 {
 namespace integrator
 {
+// Second-Order Integrators
+template<typename Value, size_t N>
+using GenericRK2 = Integrator<Value, N, method::GenericRK2>;
+
+template<typename Value, size_t N>
+using Heuns = Integrator<Value, N, method::Heuns>;
+
+template<typename Value, size_t N>
+using Midpoint = Integrator<Value, N, method::Midpoint>;
+
+template<typename Value, size_t N>
+using Ralstons = Integrator<Value, N, method::Ralstons>;
+
+// Fifth-Order Integrators
 template<typename Value, size_t N>
 using Butcher5th = Integrator<Value, N, method::Butcher5th>;
 } /*namespace integrator*/
