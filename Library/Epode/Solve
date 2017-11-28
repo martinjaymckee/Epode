@@ -1,5 +1,39 @@
-#ifndef SOLVE
-#define SOLVE
+#ifndef EPODE_SOLVE_H
+#define EPODE_SOLVE_H
 
-#endif // SOLVE
+#include "Butcher5th" // TODO: THE DEFAULT SOLVER SHOULD BECOME RKF45 EVENTUALLY
+#include "Core"
+#include "Integrator"
+
+namespace epode
+{
+
+template<typename System, typename State>
+auto solve(System system, auto dv, auto v0, auto end, State y0)
+{
+    using system_properties_t = decltype(internal::stateProperties(system(v0, y0)));
+    using state_properties_t = decltype(internal::stateProperties(y0));
+
+    static_assert(
+        // BETTER WOULD BE TO CHECK IF THE SYSTEM AND STATE TYPES HAVE A COMMON TYPE
+        std::is_same<State, decltype(system(v0, y0))>::value &&
+        system_properties_t::N == state_properties_t::N, // REDUNDANT, AT THE MOMENT...
+        "Initial state, y0, passed into solve is incompatible with the specified system of equations."
+    );
+
+    using value_t = typename std::common_type<
+        typename system_properties_t::value_t,
+        typename state_properties_t::value_t
+    >::type;
+
+    using Solver = Integrator<value_t, system_properties_t::N, method::Butcher5th>;
+
+    auto solver = Solver(dv);
+
+    return solver(system, v0, end, y0);
+}
+
+} /*namespace epode*/
+
+#endif // EPODE_SOLVE_H
 

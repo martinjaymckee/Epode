@@ -26,8 +26,10 @@ HEADERS += \
     Epode/ODE \
     Epode/Triggers \
     Epode/Step \
-    Epode/RK2
+    Epode/RK2 \
+    Epode/Solve
 
 DISTFILES += \
     ../../Tests/C++/ODE_Integration/Epode/MPL_2_0.txt \
-    ../../Tests/C++/ODE_Integration/Epode/README.md
+    ../../Tests/C++/ODE_Integration/Epode/README.md \
+    parseCSV.py

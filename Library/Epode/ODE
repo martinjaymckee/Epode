@@ -69,7 +69,13 @@ using Ralstons = Integrator<Value, N, method::Ralstons>;
 template<typename Value, size_t N>
 using Butcher5th = Integrator<Value, N, method::Butcher5th>;
 } /*namespace integrator*/
+
 } /*namespace epode*/
+
+//
+// Import the simplified "solve" syntactic sugar
+//
+#include "Solve"
 
 #endif // ODE
 

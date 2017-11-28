@@ -32,8 +32,24 @@ auto fns(Ts&&... _args) { return std::make_tuple(_args...); }
 
 namespace internal
 {
-template<typename Value, unsigned int N>
+template<typename Value, size_t N>
 using State = Eigen::Matrix<Value, 1, N>;
+
+template<typename Value, size_t _N>
+struct StateProperties {
+        using value_t = Value;
+        static constexpr size_t N = static_cast<size_t>(_N);
+};
+
+template<typename Value, int N>
+constexpr auto stateProperties(const Eigen::Matrix<Value, 1, N>&) {
+    return StateProperties<Value, N>{};
+}
+
+template<typename Value, int N>
+constexpr auto stateProperties(Eigen::Matrix<Value, 1, N>&) {
+    return StateProperties<Value, N>{};
+}
 
 template<typename Value, typename State>
 struct MethodReturn

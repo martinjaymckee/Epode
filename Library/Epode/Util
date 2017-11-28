@@ -16,6 +16,10 @@
 #ifndef EPODE_UTIL_H
 #define EPODE_UTIL_H
 
+#include <fstream>
+
+#include "Core"
+
 namespace epode
 {
 namespace util
@@ -29,6 +33,31 @@ inline Value lastInitElement(std::initializer_list<Value> _init) {
         last = *it;
     }
     return last;
+}
+
+// TODO: CURRENTLY IF THIS FAILS TO OPEN THE FILE FOR SOME REASON, THERE IS NO COMPLAINT, THE FILE
+//  SIMPLY GOES UNWRITTEN.  THAT SHOULD, PROBABLY, BE CHANGED.
+void resultsToCSV(const char* filename, auto results){
+    auto file = std::ofstream{};
+    file.open(filename, std::ofstream::out);
+    if(file) {
+        for(auto result: results) {
+            using properties_t = decltype(internal::stateProperties(result.y));
+            constexpr size_t N = properties_t::N;
+
+            file << result.dv << ", ";
+            file << result.v << ", ";
+
+            for(size_t idx = 0; idx < N; ++idx) {
+                file << result.y[idx];
+                if(idx < (N-1)) file << ", ";
+            }
+
+            file << "\n";
+        }
+
+        file.close();
+    }
 }
 
 } /*namespace util*/
