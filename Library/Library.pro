@@ -19,15 +19,15 @@ HEADERS += \
     Epode/Kutta4th \
     Epode/RKF45 \
     Epode/Step \
-    Epode/Butcher5th \
     Epode/Util \
-    Epode/Butcher5th \
     Epode/Integrator \
     Epode/ODE \
     Epode/Triggers \
     Epode/Step \
     Epode/RK2 \
-    Epode/Solve
+    Epode/Solve \
+    Epode/Butcher \
+    Epode/RKF
 
 DISTFILES += \
     ../../Tests/C++/ODE_Integration/Epode/MPL_2_0.txt \

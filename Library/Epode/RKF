@@ -1,5 +1,238 @@
-#ifndef RKF
-#define RKF
+//
+//
+// File - Epode/RKF:
+//
+//      Implementation of the adaptive Runge-Kutta methods introduced by Fehlberg in his 1968 paper.
+//  The four methods currently included are: RKF 1(2), RKF 2(3), RKF 3(4) and RKF 4(5).  For the
+//  RKF 4(5) implementation, the most typically used coefficients (formula 2) have been chosen.
+//  Likewise, the formula 1 coefficients have been chosen for the RKF 3(4) implementation as the
+//  coefficients are substantially less complicated and the truncation errors are very similar.
+//
+//
+// License:
+//
+//      This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
+//  If a copy of the MPL was not distributed with this file, You can obtain one
+//  at http://mozilla.org/MPL/2.0/.
+//
+//
 
-#endif // RKF
+#ifndef EPODE_RKF_H
+#define EPODE_RKF_H
+#include "Core"
+#include "Step"
+
+namespace epode
+{
+namespace method
+{
+
+template<typename Value, size_t N>
+class RKF12 : public internal::Adaptive<Value, 1>
+{
+    public:
+        using value_t = Value;
+        using state_t = internal::State<value_t, N>;
+        using return_t = internal::MethodReturn<value_t, state_t>;
+
+        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+            constexpr auto c0 = value_t(1) / value_t(2);
+            constexpr auto c1 = value_t(1) / value_t(256);
+            constexpr auto c2 = value_t(255) / value_t(256);
+            constexpr auto c3 = value_t(1) / value_t(512);
+
+            const auto k0 = func(v, y0);
+            size_t evals = 1;
+
+            auto y1 = y0;
+            auto dv_next = dv;
+            bool done = false;
+
+            do {
+                dv = limiter.constrain(dv_next);
+                const auto k1 = func(v+(c0*dv), y0+(c0*dv*k0));
+                const auto k2 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+                evals += 2;
+                y1 = y0 + dv*k2;
+                const auto z1 = y0 + dv*(c3*(k0+k2) + c2*k1);
+                const auto update = step::internal::updateStepSize<1>(
+                            dv, limiter.min, y1, z1, this->tolerance
+                    );
+                done = update.done;
+                dv_next = update.dv;
+            } while(!done);
+
+            return return_t{dv, dv_next, y1, evals};
+        }
+};
+
+template<typename Value, size_t N>
+class RKF23 : public internal::Adaptive<Value, 2>
+{
+    public:
+        using value_t = Value;
+        using state_t = internal::State<value_t, N>;
+        using return_t = internal::MethodReturn<value_t, state_t>;
+
+        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+            constexpr auto c0 = value_t(1) / value_t(4);
+            constexpr auto c1 = value_t(27) / value_t(40);
+            constexpr auto c2 = value_t(-189) / value_t(800);
+            constexpr auto c3 = value_t(729) / value_t(800);
+            constexpr auto c4 = value_t(214) / value_t(891);
+            constexpr auto c5 = value_t(1) / value_t(33);
+            constexpr auto c6 = value_t(650) / value_t(891);
+            constexpr auto c7 = value_t(533) / value_t(2106);
+            constexpr auto c8 = value_t(800) / value_t(1053);
+            constexpr auto c9 = value_t(-1) / value_t(78);
+
+            const auto k0 = func(v, y0);
+            size_t evals = 1;
+
+            auto y1 = y0;
+            auto dv_next = dv;
+            bool done = false;
+
+            do {
+                dv = limiter.constrain(dv_next);
+                const auto k1 = func(v+(c0*dv), y0+(c0*dv*k0));
+                const auto k2 = func(v+(c1*dv), y0+(dv*(c2*k0 + c3*k1)));
+                const auto k3 = func(v+dv, y0+(dv*(c4*k0 + c5*k1 + c6*k2)));
+                evals += 3;
+                y1 = y0 + dv*k3;
+                const auto z1 = y0 + dv*(c7*k0 + c8*k2 + c9*k3);
+                const auto update = step::internal::updateStepSize<2>(
+                            dv, limiter.min, y1, z1, this->tolerance
+                    );
+                done = update.done;
+                dv_next = update.dv;
+            } while(!done);
+
+            return return_t{dv, dv_next, y1, evals};
+        }
+};
+
+template<typename Value, size_t N>
+class RKF34 : public internal::Adaptive<Value, 3>
+{
+    public:
+        using value_t = Value;
+        using state_t = internal::State<value_t, N>;
+        using return_t = internal::MethodReturn<value_t, state_t>;
+
+        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+            constexpr auto c0 = value_t(1) / value_t(2);
+            constexpr auto c1 = value_t(1) / value_t(256);
+            constexpr auto c2 = value_t(255) / value_t(256);
+            constexpr auto c3 = value_t(1) / value_t(512);
+            constexpr auto c4 = value_t(1) / value_t(2);
+            constexpr auto c5 = value_t(1) / value_t(256);
+            constexpr auto c6 = value_t(255) / value_t(256);
+            constexpr auto c7 = value_t(1) / value_t(512);
+            constexpr auto c8 = value_t(255) / value_t(256);
+            constexpr auto c9 = value_t(1) / value_t(512);
+            constexpr auto c10 = value_t(1) / value_t(256);
+            constexpr auto c11 = value_t(255) / value_t(256);
+            constexpr auto c12 = value_t(1) / value_t(512);
+            constexpr auto c13 = value_t(255) / value_t(256);
+            constexpr auto c14 = value_t(1) / value_t(512);
+
+            const auto k0 = func(v, y0);
+            size_t evals = 1;
+
+            auto y1 = y0;
+            auto dv_next = dv;
+            bool done = false;
+
+            do {
+                dv = limiter.constrain(dv_next);
+                const auto k1 = func(v+(c0*dv), y0+(c0*dv*k0));
+                const auto k2 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+                const auto k3 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+                const auto k4 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+
+                evals += 4;
+                y1 = y0 + dv*k2;
+                const auto z1 = y0 + dv*(c3*(k0+k2) + c2*k1);
+                const auto update = step::internal::updateStepSize<3>(
+                            dv, limiter.min, y1, z1, this->tolerance
+                    );
+                done = update.done;
+                dv_next = update.dv;
+            } while(!done);
+
+            return return_t{dv, dv_next, y1, evals};
+        }
+};
+
+template<typename Value, size_t N>
+class RKF45 : public internal::Adaptive<Value, 4>
+{
+    public:
+        using value_t = Value;
+        using state_t = internal::State<value_t, N>;
+        using return_t = internal::MethodReturn<value_t, state_t>;
+
+        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+            constexpr auto c0 = value_t(1) / value_t(2);
+            constexpr auto c1 = value_t(1) / value_t(256);
+            constexpr auto c2 = value_t(255) / value_t(256);
+            constexpr auto c3 = value_t(1) / value_t(512);
+            constexpr auto c4 = value_t(1) / value_t(2);
+            constexpr auto c5 = value_t(1) / value_t(256);
+            constexpr auto c6 = value_t(255) / value_t(256);
+            constexpr auto c7 = value_t(1) / value_t(512);
+            constexpr auto c8 = value_t(255) / value_t(256);
+            constexpr auto c9 = value_t(1) / value_t(512);
+            constexpr auto c10 = value_t(1) / value_t(256);
+            constexpr auto c11 = value_t(255) / value_t(256);
+            constexpr auto c12 = value_t(1) / value_t(512);
+            constexpr auto c13 = value_t(255) / value_t(256);
+            constexpr auto c14 = value_t(1) / value_t(512);
+            constexpr auto c15 = value_t(1) / value_t(2);
+            constexpr auto c16 = value_t(1) / value_t(256);
+            constexpr auto c17 = value_t(255) / value_t(256);
+            constexpr auto c18 = value_t(1) / value_t(512);
+            constexpr auto c19 = value_t(1) / value_t(2);
+            constexpr auto c20 = value_t(1) / value_t(256);
+            constexpr auto c21 = value_t(255) / value_t(256);
+            constexpr auto c22 = value_t(1) / value_t(512);
+            constexpr auto c23 = value_t(255) / value_t(256);
+            constexpr auto c24 = value_t(1) / value_t(512);
+            constexpr auto c25 = value_t(1) / value_t(256);
+            constexpr auto c26 = value_t(255) / value_t(256);
+
+            const auto k0 = func(v, y0);
+            size_t evals = 1;
+
+            auto y1 = y0;
+            auto dv_next = dv;
+            bool done = false;
+
+            do {
+                dv = limiter.constrain(dv_next);
+                const auto k1 = func(v+(c0*dv), y0+(c0*dv*k0));
+                const auto k2 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+                const auto k3 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+                const auto k4 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+                const auto k5 = func(v+dv, y0+(dv*(c1*k0 + c2*k1)));
+
+                evals += 5;
+                y1 = y0 + dv*k2;
+                const auto z1 = y0 + dv*(c3*(k0+k2) + c2*k1);
+                const auto update = step::internal::updateStepSize<4>(
+                            dv, limiter.min, y1, z1, this->tolerance
+                    );
+                done = update.done;
+                dv_next = update.dv;
+            } while(!done);
+
+            return return_t{dv, dv_next, y1, evals};
+        }
+};
+
+} /*namespace method*/
+} /*namespace epode*/
+
+#endif // EPODE_RKF_H
 

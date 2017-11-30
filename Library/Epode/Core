@@ -82,7 +82,7 @@ struct StepPoint
         stats_t stats;
 };
 
-template<bool Adaptive, bool Implicit, unsigned int Order>
+template<typename Value, bool Adaptive, bool Implicit, unsigned int Order>
 class MethodInfo
 {
     public:
@@ -91,17 +91,25 @@ class MethodInfo
         constexpr static unsigned int order = Order;
 };
 
-template<unsigned int Order, bool Implicit = false>
-class Fixed : public MethodInfo<false, Implicit, Order> {};
+template<typename Value, unsigned int Order, bool Implicit = false>
+class Fixed : public MethodInfo<Value, false, Implicit, Order> {};
 
-template<unsigned int Order>
-using ImplicitFixed = Fixed<Order, true>;
+template<typename Value, unsigned int Order>
+using ImplicitFixed = Fixed<Value, Order, true>;
 
-template<unsigned int Order, bool Implicit = false>
-class Adaptive : public MethodInfo<true, Implicit, Order> {};
+template<typename Value, unsigned int Order, bool Implicit = false>
+class Adaptive : public MethodInfo<Value, true, Implicit, Order> {
+    public:
+        Adaptive(const Value& _tolerance = Value(1e-5)) :
+            tolerance(_tolerance) {}
 
-template<unsigned int Order>
-using ImplicitAdaptive = Adaptive<Order, true>;
+    protected:
+        Value tolerance;
+};
+
+template<typename Value, unsigned int Order>
+using ImplicitAdaptive = Adaptive<Value, Order, true>;
+
 
 // Make sure that the application functions are in a template
 template<typename... Ts> auto Functions(std::tuple<Ts...> fs) { return fs; }

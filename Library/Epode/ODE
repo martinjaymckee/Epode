@@ -26,12 +26,9 @@
 // Solver Methods
 //
 
-//  2nd Order
+#include "Butcher"
+#include "RKF"
 #include "RK2"
-
-//  5th Order
-#include "Butcher5th"
-
 
 //
 // Compositional Triggers
@@ -52,6 +49,10 @@ namespace epode
 {
 namespace integrator
 {
+// First-Order Integrators
+template<typename Value, size_t N>
+using RKF12 = Integrator<Value, N, method::RKF12>;
+
 // Second-Order Integrators
 template<typename Value, size_t N>
 using GenericRK2 = Integrator<Value, N, method::GenericRK2>;
@@ -64,6 +65,17 @@ using Midpoint = Integrator<Value, N, method::Midpoint>;
 
 template<typename Value, size_t N>
 using Ralstons = Integrator<Value, N, method::Ralstons>;
+
+template<typename Value, size_t N>
+using RKF23 = Integrator<Value, N, method::RKF23>;
+
+// Third-Order Integrators
+template<typename Value, size_t N>
+using RKF34 = Integrator<Value, N, method::RKF34>;
+
+// Fourth-Order Integrators
+template<typename Value, size_t N>
+using RKF45 = Integrator<Value, N, method::RKF45>;
 
 // Fifth-Order Integrators
 template<typename Value, size_t N>

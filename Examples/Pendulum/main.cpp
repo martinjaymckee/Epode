@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 
 #include <Eigen/Dense>
 #include <Epode/ODE>
@@ -17,27 +18,53 @@ auto pendulumSystem = [] (auto m, auto L, auto lambda) {
     };
 };
 
-int main()
-{
-    auto dt = 0.001; /*s*/
-    auto y0 = State{0/*rad/s*/, .35 /*rad*/};
-
-    cout << "Run the Pendulum Model\n";
-    // TODO: THE CURRENT IMPLEMENTATION OF SOLVE IS UNABLE TO HANDLE INPUTS WHICH VARY IN TYPE... IT IS
-    //  GOING TO BE NECESSARY TO FIND SOME WAY TO GET THE "CORRECT" TYPES TO PASS INTO THE SYSTEM
-    //  CALL OPERATOR WITHOUT EXPLICITLY NAMING TYPES (OR IMPLICITLY, AS THE CASE MAY BE BY ADDING
-    //  THE DECIMAL-POINT, ZERO.
-    auto results = epode::solve(
-        pendulumSystem(1.0/*kg*/, 0.1 /*m*/, 1.6),
-        dt, 0.0, 2.0, y0
-    );
-    epode::util::resultsToCSV("pendulum_1.csv", results);
-
-    results = epode::solve(
-        pendulumSystem(1.0/*kg*/, 0.1 /*m*/, 4.8),
-        dt, 0.0, 2.0, y0
-    );
-    epode::util::resultsToCSV("pendulum_2.csv", results);
-    return 0;
+void statistics(int run, auto results) {
+    auto stats = results.back().stats;
+    cout << "Run #" << run << ":\n";
+    cout << "\tIteration Steps = " << stats.steps << "\n";
+    cout << "\tFunction Evals = " << stats.evals << "\n";
 }
 
+std::string filename(int idx) {
+    ostringstream s;
+    s << "pendulum_" << idx << ".csv";
+    return s.str();
+}
+
+std::string header(int idx, auto lambda) {
+    ostringstream s;
+    s << "#name:Pendulum Example Run #" << idx << "\n";
+    s << "#label:$\\lambda=" << lambda << "$";
+    return s.str();
+}
+
+int main()
+{
+    auto dt = 0.01;
+    auto t_end = 2;
+    auto y0 = State{0, .35}; // rad/s, rad
+    auto lambda_min = 0;
+    auto lambda_max = 5;
+    auto N = 5;
+
+    cout << "Run the Pendulum Model\n";
+    auto lambda_range = lambda_max - lambda_min;
+    auto lambda_step = lambda_range / (N-1);
+
+    for(int idx=0; idx < N; ++idx) {
+        auto lambda = lambda_min + (idx * lambda_step);
+
+        auto results = epode::solve(
+            pendulumSystem(1.0, 0.1, lambda),   // system parameters: m, L, lambda
+            dt,                                 // Initial step size
+            0,                                  // Start time
+            t_end,                              // End time
+            y0                                  // Initial system state
+        );
+
+        epode::util::resultsToCSV(filename(idx), results, header(idx, lambda));
+        statistics(idx, results);
+    }
+
+    return 0;
+}

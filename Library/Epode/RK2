@@ -31,7 +31,7 @@ namespace method
 {
 
 template<typename Value, size_t N>
-class GenericRK2 : public internal::Fixed<2>
+class GenericRK2 : public internal::Fixed<Value, 2>
 {
     public:
         using value_t = Value;

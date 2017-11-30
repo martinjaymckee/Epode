@@ -35,12 +35,16 @@ inline Value lastInitElement(std::initializer_list<Value> _init) {
     return last;
 }
 
-// TODO: CURRENTLY IF THIS FAILS TO OPEN THE FILE FOR SOME REASON, THERE IS NO COMPLAINT, THE FILE
-//  SIMPLY GOES UNWRITTEN.  THAT SHOULD, PROBABLY, BE CHANGED.
-void resultsToCSV(const char* filename, auto results){
+bool resultsToCSV(
+        const std::string& filename, auto results,
+        const std::string& header = std::string()
+        ) {
     auto file = std::ofstream{};
     file.open(filename, std::ofstream::out);
+
     if(file) {
+        file << header << "\n";
+
         for(auto result: results) {
             using properties_t = decltype(internal::stateProperties(result.y));
             constexpr size_t N = properties_t::N;
@@ -57,7 +61,11 @@ void resultsToCSV(const char* filename, auto results){
         }
 
         file.close();
+        return true;
     }
+
+    // TODO: SOME SORT OF ERROR HANDLING
+    return false;
 }
 
 } /*namespace util*/

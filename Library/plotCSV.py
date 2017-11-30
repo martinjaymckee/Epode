@@ -76,26 +76,28 @@ if __name__ == '__main__':
     #
     args = parser.parse_args()
     assert 2 <= len(args.axes) <= 3, "Invalid axes length of {}".format(len(args.axes))
-    if not args.labels is None:
-        assert len(args.labels) >= len(args.axes), "Not all axes have matching labels!"
     axes = args.axes
     output = args.output
-    labels = args.labels
 
     pattern_csvs = args.csvs
     csvs = set()
     for file in os.listdir(args.directory):
         for pattern in pattern_csvs:
             if fnmatch.fnmatch(file, pattern):
-                print(file)
-                new_csv = open(file, 'r')
-                csvs.append(new_csv)
+                new_csv = open(os.path.join(args.directory, file), 'r')
+                csvs.add(new_csv)
+    if not args.labels is None:
+        assert len(args.labels) >= len(csvs), "Not all files have matching explicit labels!"
+    csvs = list(csvs)
+    csvs.sort(key=lambda x: x.name)
 
     #
     # Set Style Variables
     #
-    plt.style.use('seaborn-colorblind')
+    plt.style.use('seaborn-white')
     mpl.rc('lines', linewidth=2)
+    cm = mpl.cm.viridis
+    colors = [cm(x) for x in np.linspace(0, 1, len(csvs)) ]
 
     #
     # Parse Datafiles and produce a list of (np.array(), filename) tuples
@@ -103,11 +105,11 @@ if __name__ == '__main__':
     data = []
     for idx, csv in enumerate(csvs):
         new_data = np.genfromtxt(csv, delimiter=',', comments="#")
+        csv.seek(0)
         new_config = fileConfig(csv)
-        print(new_config)
-        new_label = os.path.basename(csv.name)
-        if not labels is None:
-            new_label = labels[idx]
+        new_label = new_config.get('label', os.path.basename(csv.name))
+        if not args.labels is None:
+            new_label = args.labels[idx]
         data.append( (new_data, new_label) )
 
     #
@@ -115,8 +117,8 @@ if __name__ == '__main__':
     #
     fig = plt.figure()
     ax = fig.add_subplot(111, projection = projection(axes))
-    for vals, label in data:
-        ax.plot(*series(vals, axes), alpha=0.75, label=label)
+    for idx, (vals, label) in enumerate(data):
+        ax.plot(*series(vals, axes), alpha=0.75, color=colors[idx], label=label)
     ax.legend(shadow=True)
     if not args.output is None: plt.savefig(output, bbox_inches='tight')
     plt.show()

@@ -24,7 +24,7 @@ namespace method
 {
 
 template<typename Value, size_t N>
-class Butcher5th : public internal::Fixed<5>
+class Butcher5th : public internal::Fixed<Value, 5>
 {
     public:
         using value_t = Value;

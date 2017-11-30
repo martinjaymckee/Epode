@@ -15,6 +15,7 @@
 
 #ifndef STEP
 #define STEP
+#include <cmath>
 
 namespace epode
 {
@@ -41,6 +42,77 @@ struct StepLimits
 
 namespace internal
 {
+
+//
+// Calculate the stepsize scaling for an adaptive method of order N
+//
+//  Implementtion in the case of N > 1
+template<size_t N>
+struct stepScalingImpl
+{
+        template<typename Value>
+        constexpr static Value calc(const Value& tolerance, const Value& error) {
+            return pow(abs(error / tolerance), (Value(1) / Value(N-1)));
+        }
+};
+
+//  Implementation in the case of first-order (N = 1)
+template<>
+struct stepScalingImpl<1>
+{
+        template<typename Value>
+        constexpr static Value calc(const Value& tolerance, const Value& error) {
+            return abs(error / tolerance);
+        }
+};
+
+//  Wrapper Method
+template<size_t N, typename Value>
+Value stepScaling(const Value& tolerence, const Value& error) {
+    return stepScalingImpl<N>::calc(tolerence, error);
+}
+
+//  Method to update the step size
+template<typename Value>
+struct StepSizeUpdate {
+        const bool done;
+        const Value dv;
+};
+
+template<size_t N, typename Value>
+StepSizeUpdate<Value> updateStepSize(
+        const Value& dv,
+        const Value& dv_min,
+        auto y,
+        auto z,
+        const Value& tolerance,
+        const Value& scale_min = Value(0.33),
+        const Value& scale_max = Value(3.0)
+        ) {
+    bool done = false;
+    const auto error = (z-y).norm();
+    const auto scale = stepScalingImpl<N>::calc(error, tolerance);
+    auto dv_next = dv;
+    if(scale < Value(1.0)) {
+        if(dv <= dv_min) {
+            done = true;
+            dv_next = dv_min;
+        } else {
+            dv_next = dv * ((scale < scale_min) ? scale_min : scale);
+        }
+    } else {
+        dv_next = dv * ((scale > scale_max) ? scale_max : scale);
+        done = true;
+    }
+
+    return {done, dv_next};
+}
+
+//
+// Construct a step limiter object based on the input "end" specification
+//
+
+//  Single end-point limiter
 template<typename LimitsType, typename Value>
 auto constructLimiter(auto v1) {
     return [=](auto, auto v) {return LimitsType(v1-v); };
