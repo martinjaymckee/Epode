@@ -6,5 +6,5 @@ CONFIG -= qt
 SOURCES += main.cpp
 
 INCLUDEPATH += /usr/include/eigen3/
-INCLUDEPATH += /home/martin/Workspace/Epode/Library/
+INCLUDEPATH += ../../Library/
 

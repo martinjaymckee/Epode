@@ -1,7 +1,8 @@
 #ifndef EPODE_SOLVE_H
 #define EPODE_SOLVE_H
 
-//#include "Butcher" // TODO: THE DEFAULT SOLVER SHOULD BECOME RKF45 EVENTUALLY
+#include "BogackiShampine"
+#include "Butcher" // TODO: THE DEFAULT SOLVER SHOULD BECOME RKF45 EVENTUALLY
 #include "RKF"
 #include "Core"
 #include "Integrator"
@@ -26,9 +27,14 @@ auto solve(System system, auto dv, auto v0, auto end, State y0)
     >::type;
 
     //using Solver = Integrator<value_t, system_properties_t::N, method::Butcher5th>;
-    using Solver = Integrator<value_t, system_properties_t::N, method::RKF23>;
+    /using Solver = Integrator<value_t, system_properties_t::N, method::RKF12>;
+    //using Solver = Integrator<value_t, system_properties_t::N, method::RKF23>;
+    //using Solver = Integrator<value_t, system_properties_t::N, method::RKF34>;
+    //using Solver = Integrator<value_t, system_properties_t::N, method::RKF45>;
+    //using Solver = Integrator<value_t, system_properties_t::N, method::BS32>;
+    //using Solver = Integrator<value_t, system_properties_t::N, method::BS45>;
 
-    auto solver = Solver(dv);
+    auto solver = Solver(dv, 1e-10);
 
     return solver(system, v0, end, y0);
 }

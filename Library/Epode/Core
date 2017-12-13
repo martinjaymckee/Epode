@@ -91,23 +91,28 @@ class MethodInfo
         constexpr static unsigned int order = Order;
 };
 
-template<typename Value, unsigned int Order, bool Implicit = false>
+template<typename Value>
+constexpr Value defaultTolerance(const Value base_tolerance, size_t Order) {
+    return (Order == 0) ? base_tolerance : defaultTolerance(base_tolerance, Order-1) / Value(5);
+}
+
+template<typename Value, size_t Order, bool Implicit = false>
 class Fixed : public MethodInfo<Value, false, Implicit, Order> {};
 
-template<typename Value, unsigned int Order>
+template<typename Value, size_t Order>
 using ImplicitFixed = Fixed<Value, Order, true>;
 
-template<typename Value, unsigned int Order, bool Implicit = false>
+template<typename Value, size_t Order, bool Implicit = false>
 class Adaptive : public MethodInfo<Value, true, Implicit, Order> {
     public:
-        Adaptive(const Value& _tolerance = Value(1e-5)) :
+        Adaptive(const Value& _tolerance = defaultTolerance(1e-6, Order)) :
             tolerance(_tolerance) {}
 
     protected:
         Value tolerance;
 };
 
-template<typename Value, unsigned int Order>
+template<typename Value, size_t Order>
 using ImplicitAdaptive = Adaptive<Value, Order, true>;
 
 

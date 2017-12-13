@@ -27,7 +27,9 @@ HEADERS += \
     Epode/RK2 \
     Epode/Solve \
     Epode/Butcher \
-    Epode/RKF
+    Epode/RKF \
+    Epode/BogackiShampine \
+    Epode/Euler
 
 DISTFILES += \
     ../../Tests/C++/ODE_Integration/Epode/MPL_2_0.txt \
