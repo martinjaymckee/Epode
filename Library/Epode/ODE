@@ -13,8 +13,8 @@
 //
 //
 
-#ifndef ODE
-#define ODE
+#ifndef EPODE_ODE_H
+#define EPODE_ODE_H
 
 //
 // Core Files
@@ -25,8 +25,9 @@
 //
 // Solver Methods
 //
-
 #include "Butcher"
+#include "BogackiShampine"
+#include "Euler"
 #include "RKF"
 #include "RK2"
 
@@ -49,7 +50,14 @@ namespace epode
 {
 namespace integrator
 {
+
 // First-Order Integrators
+template<typename Value, size_t N>
+using Euler = Integrator<Value, N, method::Euler>;
+
+template<typename Value, size_t N>
+using HeunEuler = Integrator<Value, N, method::HeunEuler>;
+
 template<typename Value, size_t N>
 using RKF12 = Integrator<Value, N, method::RKF12>;
 
@@ -73,15 +81,21 @@ using RKF23 = Integrator<Value, N, method::RKF23>;
 template<typename Value, size_t N>
 using RKF34 = Integrator<Value, N, method::RKF34>;
 
+template<typename Value, size_t N>
+using BS32 = Integrator<Value, N, method::BS32>;
+
 // Fourth-Order Integrators
 template<typename Value, size_t N>
 using RKF45 = Integrator<Value, N, method::RKF45>;
 
+template<typename Value, size_t N>
+using BS45 = Integrator<Value, N, method::BS45>;
+
 // Fifth-Order Integrators
 template<typename Value, size_t N>
 using Butcher5th = Integrator<Value, N, method::Butcher5th>;
-} /*namespace integrator*/
 
+} /*namespace integrator*/
 } /*namespace epode*/
 
 //
@@ -89,5 +103,5 @@ using Butcher5th = Integrator<Value, N, method::Butcher5th>;
 //
 #include "Solve"
 
-#endif // ODE
+#endif /*EPODE_ODE_H*/
 

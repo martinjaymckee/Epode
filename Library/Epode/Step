@@ -73,39 +73,33 @@ Value stepScaling(const Value& tolerence, const Value& error) {
 }
 
 //  Method to update the step size
+//      TODO: FIGURE OUT IF THERE'S A GOOD WAY TO MAKE THESE VALUES CONST GIVEN THE STRUCTURE OF THE BS45 IMPLEMENTATION
 template<typename Value>
 struct StepSizeUpdate {
-        const bool done;
-        const Value dv;
+        /*const*/ bool done;
+        /*const*/ Value dv;
 };
 
 template<size_t N, typename Value>
 StepSizeUpdate<Value> updateStepSize(
-        const Value& dv,
-        const Value& dv_min,
-        auto y,
-        auto z,
-        const Value& tolerance,
-        const Value& scale_min = Value(0.33),
-        const Value& scale_max = Value(3.0)
+            const Value& dv, const Value& dv_min,
+            auto y, auto z, const Value& tolerance,
+            const Value& scale_min = Value(0.33),
+            const Value& scale_max = Value(3.0)
         ) {
-    bool done = false;
+    constexpr auto scale_threshold = Value(1.0);
     const auto error = (z-y).norm();
     const auto scale = stepScalingImpl<N>::calc(error, tolerance);
-    auto dv_next = dv;
-    if(scale < Value(1.0)) {
-        if(dv <= dv_min) {
-            done = true;
-            dv_next = dv_min;
-        } else {
-            dv_next = dv * ((scale < scale_min) ? scale_min : scale);
+    return [=]() -> StepSizeUpdate<Value> {
+        if(scale < scale_threshold) {
+            if(dv <= dv_min) {
+                return {true, dv_min};
+            } else {
+                return {false, dv * ((scale < scale_min) ? scale_min : scale)};
+            }
         }
-    } else {
-        dv_next = dv * ((scale > scale_max) ? scale_max : scale);
-        done = true;
-    }
-
-    return {done, dv_next};
+        return {true, dv * ((scale > scale_max) ? scale_max : scale)};
+    }();
 }
 
 //

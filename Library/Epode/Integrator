@@ -123,9 +123,9 @@ class Integrator
         void initMethod(V, V, S, Ts...) {}
 
         template<typename V, typename S>
-        auto initMethod(V dv, V v, S y, auto _method)
-        -> decltype(_method.init(dv, v, y)) {
-            return _method.init(dv, v, y);
+        auto initMethod(V dv, V v, S y, auto _func, auto _method)
+        -> decltype(_method.init(dv, v, y, _func)) {
+            return _method.init(dv, v, y, _func);
         }
 
         //
@@ -150,7 +150,7 @@ class Integrator
             auto y = y0;
             auto v = v0;
 
-            initMethod(dv, v, y, method);
+            initMethod(dv, v, y, f0, method);
 
             auto limits = limiter(dv, v);
 
