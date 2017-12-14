@@ -32,4 +32,7 @@ HEADERS += \
 DISTFILES += \
     ../../Tests/C++/ODE_Integration/Epode/MPL_2_0.txt \
     ../../Tests/C++/ODE_Integration/Epode/README.md \
-    parseCSV.py
+    parseCSV.py \
+    plotCSV.py \
+    otree.py \
+    auto_label.py
