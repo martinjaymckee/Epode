@@ -1,9 +1,10 @@
 //
 //
-// File - Epode/Util:
+// File - Epode/util.h:
 //
 //      Functions to simplify the implementation of other Epode features.
 //
+//  TODO: DECIDE IF THIS FILE IS REALLY REQUIRED... OR IF THE FUNCTIONALITY CAN GO ELSEWHERE.
 //
 // License:
 //
@@ -18,7 +19,7 @@
 
 #include <fstream>
 
-#include "Core"
+#include "core.h"
 
 namespace epode
 {

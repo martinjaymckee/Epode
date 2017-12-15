@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/BogackiShampine:
+// File - Epode/bogacki_shampine.h:
 //
 //      Implementation of the Bogacki-Shampine 3(2) and 4(5) adaptive methods.
 //
@@ -16,8 +16,8 @@
 #ifndef EPODE_BOGACKISHAMPINE_H
 #define EPODE_BOGACKISHAMPINE_H
 
-#include "Core"
-#include "Step"
+#include "core.h"
+#include "step.h"
 
 namespace epode
 {

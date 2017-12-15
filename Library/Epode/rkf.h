@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/RKF:
+// File - Epode/rkf.h:
 //
 //      Implementation of the adaptive Runge-Kutta methods introduced by Fehlberg in his 1968 paper.
 //  The four methods currently included are: RKF 1(2), RKF 2(3), RKF 3(4) and RKF 4(5).  For the
@@ -19,8 +19,8 @@
 
 #ifndef EPODE_RKF_H
 #define EPODE_RKF_H
-#include "Core"
-#include "Step"
+#include "core.h"
+#include "step.h"
 
 namespace epode
 {

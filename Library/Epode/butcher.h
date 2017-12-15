@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/Butchers5th:
+// File - Epode/butcher.h:
 //
 //      Implementation of the Butcher's 5th-order method.
 //
@@ -16,7 +16,7 @@
 #ifndef EPODE_BUTCHERS5TH_H
 #define EPODE_BUTCHERS5TH_H
 
-#include "Core"
+#include "core.h"
 
 namespace epode
 {

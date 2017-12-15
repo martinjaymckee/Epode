@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/Core:
+// File - Epode/core.h:
 //
 //      Basic type definitions required to implement the whole of the Epode library.  These are
 //  mostly basic types (and type aliases) which are used for data forwarding and storage or are

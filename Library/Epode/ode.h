@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/ODE:
+// File - Epode/ode.h:
 //
 //      Simply include all the files to do ODE solving with Epode.
 //
@@ -19,29 +19,29 @@
 //
 // Core Files
 //
-#include "Core"
-#include "Util"
+#include "core.h"
+#include "util.h"
 
 //
 // Solver Methods
 //
-#include "Butcher"
-#include "BogackiShampine"
-#include "Euler"
-#include "RKF"
-#include "RK2"
+#include "butcher.h"
+#include "bogacki_shampine.h"
+#include "euler.h"
+#include "rkf.h"
+#include "rk2.h"
 
 //
 // Compositional Triggers
 //
-#include "Triggers"
+#include "triggers.h"
 
 
 //
 // Integrator Wrapper and associated classes
 //
-#include "Step"
-#include "Integrator"
+#include "step.h"
+#include "integrator.h"
 
 //
 // Declare Wrapped Integration Methods
@@ -101,7 +101,7 @@ using Butcher5th = Integrator<Value, N, method::Butcher5th>;
 //
 // Import the simplified "solve" syntactic sugar
 //
-#include "Solve"
+#include "solve.h"
 
 #endif /*EPODE_ODE_H*/
 

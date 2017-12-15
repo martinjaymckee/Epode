@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/Integrator:
+// File - Epode/integrator.h:
 //
 //      Implementation of the Integrator wrapper class to handle creation of event triggers,
 //  function objects, etc. and to run the integration.
@@ -21,9 +21,9 @@
 #include <initializer_list>
 #include <vector>
 
-#include "Core"
-#include "Step"
-#include "Triggers"
+#include "core.h"
+#include "step.h"
+#include "triggers.h"
 
 namespace epode
 {

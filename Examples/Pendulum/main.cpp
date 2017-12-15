@@ -2,8 +2,8 @@
 #include <sstream>
 
 #include <Eigen/Dense>
-#include <Epode/ODE>
-#include <Epode/Util>
+#include <Epode/ode.h>
+#include <Epode/util.h>
 
 using namespace std;
 

@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/Euler:
+// File - Epode/euler.h:
 //
 //      Implementation of the Forward Euler method as well as the adaptive Heun-Euler method.
 //

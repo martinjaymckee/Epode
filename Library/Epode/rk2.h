@@ -1,9 +1,6 @@
-#ifndef RK2
-#define RK2
-
 //
 //
-// File - Epode/RK2:
+// File - Epode/rk2.h:
 //
 //      Implementation of a selection of Runge-Kutta 2nd-order methods.  Initially, a generic
 //  Runge-Kutta 2nd-order class is implemented and the remainder of the methods -- Heun's,
@@ -23,7 +20,7 @@
 
 #include <iostream>
 
-#include "Core"
+#include "core.h"
 
 namespace epode
 {
@@ -89,8 +86,4 @@ class Ralstons : public GenericRK2<Value, N>
 
 #endif // EPODE_RK2_H
 
-
-
-
-#endif // RK2
 

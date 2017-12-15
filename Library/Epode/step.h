@@ -1,6 +1,6 @@
 //
 //
-// File - Epode/Step:
+// File - Epode/step.h:
 //
 //      Data types and functions to handle single steps of the integration variable.
 //

@@ -8,28 +8,24 @@ INCLUDEPATH += /usr/include/eigen3/
 SOURCES += main.cpp
 
 HEADERS += \
-    Epode/ODE \
-    Epode/Euler \
-    Epode/Core \
-    Epode/Integrator \
     Epode/Midpoint \
     Epode/Heun \
     Epode/Ralston \
     Epode/Kutta3rd \
     Epode/Kutta4th \
     Epode/RKF45 \
-    Epode/Step \
-    Epode/Util \
-    Epode/Integrator \
-    Epode/ODE \
-    Epode/Triggers \
-    Epode/Step \
-    Epode/RK2 \
-    Epode/Solve \
-    Epode/Butcher \
-    Epode/RKF \
-    Epode/BogackiShampine \
-    Epode/Euler
+    Epode/butcher.h \
+    Epode/core.h \
+    Epode/euler.h \
+    Epode/bogacki_shampine.h \
+    Epode/integrator.h \
+    Epode/ode.h \
+    Epode/solve.h \
+    Epode/step.h \
+    Epode/triggers.h \
+    Epode/util.h \
+    Epode/rk2.h \
+    Epode/rkf.h
 
 DISTFILES += \
     ../../Tests/C++/ODE_Integration/Epode/MPL_2_0.txt \
