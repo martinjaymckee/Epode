@@ -1,0 +1,50 @@
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: epodemanual.aux
+The style file: unsrt.bst
+Database file #1: epodemanualreferences.bib
+Warning--empty journal in fehlberg1969low
+Warning--empty publisher in chua1992genesis
+Warning--empty year in chua1992genesis
+You've used 5 entries,
+            1791 wiz_defined-function locations,
+            475 strings with 4116 characters,
+and the built_in function-call counts, 890 in all, are:
+= -- 77
+> -- 24
+< -- 0
++ -- 11
+- -- 6
+* -- 57
+:= -- 148
+add.period$ -- 14
+call.type$ -- 5
+change.case$ -- 4
+chr.to.int$ -- 0
+cite$ -- 8
+duplicate$ -- 45
+empty$ -- 98
+format.name$ -- 6
+if$ -- 190
+int.to.chr$ -- 0
+int.to.str$ -- 5
+missing$ -- 6
+newline$ -- 27
+num.names$ -- 5
+pop$ -- 17
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 0
+skip$ -- 15
+stack$ -- 0
+substring$ -- 47
+swap$ -- 4
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 0
+warning$ -- 3
+while$ -- 10
+width$ -- 6
+write$ -- 51
+(There were 3 warnings)

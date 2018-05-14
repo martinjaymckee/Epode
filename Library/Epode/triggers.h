@@ -19,6 +19,9 @@
 #ifndef EPODE_TRIGGERS_H
 #define EPODE_TRIGGERS_H
 
+#include <initializer_list>
+#include <type_traits>
+
 namespace epode
 {
 namespace triggers
@@ -39,6 +42,26 @@ auto constructEndTrigger(Value v1) {
     return [=](auto /*dv*/, auto v, auto /*y*/, auto /*stats*/, auto limits) -> bool {
         return v > (v1 - limits.min);
     };
+}
+
+// Construct an End Trigger Function from an Initializer List
+template<typename Value>
+auto constructEndTrigger(std::initializer_list<Value> vs) {
+    Value v1;
+    for (auto it = vs.begin(); it != vs.end(); ++it) {
+        v1 = *it;
+    }
+    return [=](auto /*dv*/, auto v, auto /*y*/, auto /*stats*/, auto limits) -> bool {
+        return v > (v1 - limits.min);
+    };
+}
+
+// Construct an End Trigger as a Copy -- Disable of trig is convertible to Value
+template<typename Value,
+         typename Trigger,
+         typename = std::enable_if_t<!std::is_convertible<Trigger, Value>::value> >
+Trigger constructEndTrigger(Trigger trig) {
+    return trig;
 }
 
 } /*namespace internal*/

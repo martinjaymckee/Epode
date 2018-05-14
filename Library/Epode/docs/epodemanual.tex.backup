@@ -107,8 +107,6 @@
       EACH OF THE METHODS SHOULD HAVE A DESCRIPTION OF THE METHOD, THE BUTCHERS TABLEAU, AND ANY REFERENCES.  ADDITIONALLY, THE FILE THAT CONTAINS THE IMPLEMENTATION SHOULD BE STATED.
       
       \subsection{Forward Euler}   
-	The Forward Euler method of integration is by far the simplest.  It uses only the current state and the derivitive of the state at the current point to extrapolate the state at the next point.  While this makes the method simple to implement and easy to understand, it does lead to an integration method which cannot be both accurate and fast.  If the timestep is made so small that some level of accuracy is attained, the runtime becomes prohibitive.  In any case, the low order of Euler's method makes truly accurate calculations impossible in any case.  The butcher's tableau for Forward Euler is:
-	
 	\[
 	  \begin{array}{c|c}
 	    0 & 0\\
@@ -116,8 +114,6 @@
 	    & 1
 	  \end{array}
 	\]
-	
-	Forward Euler is provided mostly because it can be used as an exceptionally quick to run comparison for a more usable method.
 	
 	\srcas{Euler}
 	
@@ -134,8 +130,7 @@
 	    & 1/512 & 255/256 & 1/512\\
 	  \end{array}
 	\]    
-	\epode{} implements the adaptive loop by removing the first evaluation from the loop, as it does not depend upon the timestep.
-	
+
 	\srcas{RKF}
     	
       \subsection{Generic 2nd-Order Runge-Kutta}
@@ -164,7 +159,7 @@
 	  \end{array}
 	\]
 
-	\srcas{RK2}
+	Available with: \srcas{RK2}
 	
       \subsection{Midpoint}
 	\[
@@ -176,7 +171,7 @@
 	  \end{array}
 	\]    
 
-	\srcas{RK2}
+	Available with: \srcas{RK2}
 	
       \subsection{Ralston's}
 	\[
@@ -188,14 +183,14 @@
 	  \end{array}
 	\]      
 
-	\srcas{RK2}
+	Available with: \srcas{RK2}
 
       \subsection{Euler/Heun}
     
-    	\srcas{Euler}
+    	Available with: \srcas{Euler}
 
       \subsection{RK3}
-	\srcas{RK3}
+	Available with: \srcas{RK3}
     
     
       \subsection{Bogacki–Shampine 3(2)}
@@ -210,34 +205,20 @@
 	    & 7/24 & 1/4 & 1/3 & 1/8\\
 	  \end{array}
 	\]    
-    	\srcas{BS32}
+    	Available with: \srcas{BS32}
 
     
       \subsection{RK4}
-    	\srcas{RK4}
+    	Available with: \srcas{RK4}
 
     
       \subsection{RKF4(5)}
-	Introduced by Fehlberg in \cite{fehlberg1969low}, the RKF 4(5) method has been used as the default method\footnote{In some cases, related $4^{th}$/$5^{th}$ order methods like the Cash-Karp 4(5) or the Dormand-Prince 4(5) method has been used.  In any case, the RKF 4(5) method is important as representing a very good blend of accuracy and speed in problem-space of ode integration.} in a variety of ODE solvers since it's introduction in the late sixties.  The method has an amortiezed cost of six function evaluations per step and an error of order four.  The method is described by the butcher's tableau,
-	\[
-	  \begin{array}{c|cccc}
-	    0 & & & &\\
-	    1/2 & 1/2 & & &\\
-	    3/4 & 0 & 3/4 & &\\	    
-	    1 & 2/9 & 1/3 & 4/9 &\\	    
-	    \hline
-	    & 2/9 & 1/3 & 4/9 & 0\\
-	    & 7/24 & 1/4 & 1/3 & 1/8\\
-	  \end{array}
-	\]
-	
-	Because it does not depend upon the timestep, the first evaluation is removed from the adaptation loop and, therefore, additional adaptation steps require only five function evaluations.
-	
-	\srcas{RKF}
+	\cite{fehlberg1969low}      
+	Available with: \srcas{RKF}
     
 
       \subsection{Butcher's 5th}
-	\srcas{Butchers}
+	Available with: \srcas{Butchers}
     
     
     %\section{Implicit Methods}

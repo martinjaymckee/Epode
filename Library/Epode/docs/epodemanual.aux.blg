@@ -1,0 +1,5 @@
+[1] Config.pm:340> INFO - This is Biber 2.4
+[2] Config.pm:343> INFO - Logfile is 'epodemanual.aux.blg'
+[107] biber:287> INFO - === Mon Nov 27, 2017, 12:13:54
+[220] Utils.pm:163> ERROR - Cannot find control file 'epodemanual.aux.bcf'! - did you pass the "backend=biber" option to BibLaTeX?
+[220] Biber.pm:113> INFO - ERRORS: 1

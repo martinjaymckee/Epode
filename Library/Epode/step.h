@@ -16,6 +16,7 @@
 #ifndef STEP
 #define STEP
 #include <cmath>
+#include <initializer_list>
 
 namespace epode
 {
@@ -108,8 +109,27 @@ StepSizeUpdate<Value> updateStepSize(
 
 //  Single end-point limiter
 template<typename LimitsType, typename Value>
-auto constructLimiter(auto v1) {
-    return [=](auto, auto v) {return LimitsType(v1-v); };
+auto constructLimiter(Value v1) {
+    return [=](auto, auto v) { return LimitsType(v1-v); };
+}
+
+//  Single end-point limiter
+template<typename LimitsType, typename Value>
+auto constructLimiter(std::initializer_list<Value> vs) {
+    Value v1;
+    for (auto it = vs.begin(); it != vs.end(); ++it) {
+        v1 = *it;
+    }
+    return [=](auto, auto v) { return LimitsType(v1-v); };
+}
+
+//  Construct default limiter, if type is unknown, construct a default limiter
+template<typename LimitsType,
+         typename Value,
+         typename Initializer,
+         typename = std::enable_if_t<!std::is_convertible<Initializer, Value>::value> >
+auto constructLimiter(Initializer) {
+    return [=](auto, auto) { return LimitsType(); };
 }
 
 } /*namespace internal*/

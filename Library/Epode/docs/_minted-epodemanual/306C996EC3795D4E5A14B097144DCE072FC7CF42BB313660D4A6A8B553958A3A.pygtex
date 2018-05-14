@@ -1,0 +1,15 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+      \PYG{k}{using} \PYG{k}{namespace} \PYG{n}{epode}\PYG{p}{;}
+      \PYG{k}{using} \PYG{n}{solver\PYGZus{}t} \PYG{o}{=} \PYG{n}{epode}\PYG{o}{::}\PYG{n}{integrator}\PYG{o}{::}\PYG{n}{Euler}\PYG{o}{\PYGZlt{}}\PYG{k+kt}{double}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{o}{\PYGZgt{}}\PYG{p}{;}
+      \PYG{k}{using} \PYG{n}{state\PYGZus{}t} \PYG{o}{=} \PYG{k}{typename} \PYG{n}{solver\PYGZus{}t}\PYG{o}{::}\PYG{n}{state\PYGZus{}t}\PYG{p}{;}
+      \PYG{k}{auto} \PYG{n}{f} \PYG{o}{=} \PYG{p}{[](}\PYG{k}{auto} \PYG{n}{v}\PYG{p}{,} \PYG{k}{auto} \PYG{n}{y}\PYG{p}{)\PYGZob{}}
+	\PYG{k}{return} \PYG{p}{\PYGZob{}}
+	  \PYG{n}{y}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{o}{+} \PYG{n}{v}\PYG{o}{*}\PYG{n}{y}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{),}
+	  \PYG{o}{\PYGZhy{}}\PYG{n}{y}\PYG{p}{(}\PYG{l+m+mi}{1}\PYG{p}{),}
+	  \PYG{n}{y}\PYG{p}{(}\PYG{l+m+mi}{0}\PYG{p}{)} \PYG{o}{*} \PYG{n}{y}\PYG{p}{(}\PYG{l+m+mi}{2}\PYG{p}{)}
+	\PYG{p}{\PYGZcb{}}
+      \PYG{p}{\PYGZcb{}} \PYG{o}{\PYGZhy{}\PYGZgt{}} \PYG{n}{state\PYGZus{}t}\PYG{p}{;}
+      \PYG{k}{auto} \PYG{n}{y0} \PYG{o}{=} \PYG{n}{state\PYGZus{}t}\PYG{p}{\PYGZob{}}\PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{,} \PYG{l+m+mi}{3}\PYG{p}{\PYGZcb{};}
+      \PYG{k}{auto} \PYG{n}{solver} \PYG{o}{=} \PYG{n}{Solver}\PYG{p}{(}\PYG{l+m+mf}{0.01}\PYG{p}{);} \PYG{c+c1}{// Step integration variable by 0.01}
+      \PYG{n}{solver}\PYG{p}{(}\PYG{n}{f}\PYG{p}{,} \PYG{l+m+mi}{0}\PYG{p}{,} \PYG{p}{\PYGZob{}}\PYG{l+m+mf}{0.5}\PYG{p}{,} \PYG{l+m+mi}{1}\PYG{p}{,} \PYG{l+m+mf}{1.5}\PYG{p}{,} \PYG{l+m+mi}{2}\PYG{p}{\PYGZcb{},} \PYG{n}{y0}\PYG{p}{);}
+\end{Verbatim}

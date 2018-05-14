@@ -1,0 +1,29 @@
+\begin{thebibliography}{1}
+
+\bibitem{fehlberg1969low}
+Erwin Fehlberg.
+\newblock Low-order classical runge-kutta formulas with stepsize control and
+  their application to some heat transfer problems.
+\newblock 1969.
+
+\bibitem{wade2011going}
+Amanda Wade.
+\newblock Going ballistic: bullet trajectories.
+\newblock {\em Undergraduate Journal of Mathematical Modeling: One+ Two},
+  4(1):5, 2011.
+
+\bibitem{nelson1986pendulum}
+Robert~A Nelson and MG~Olsson.
+\newblock The pendulum—rich physics from a simple system.
+\newblock {\em American Journal of Physics}, 54(2):112--121, 1986.
+
+\bibitem{chua1992genesis}
+Leon~O Chua.
+\newblock {\em The genesis of Chua's circuit}.
+
+\bibitem{kennedy1992robust}
+Michael~Peter Kennedy.
+\newblock Robust op amp realization of chua's circuit.
+\newblock {\em Frequenz}, 46(3-4):66--80, 1992.
+
+\end{thebibliography}
