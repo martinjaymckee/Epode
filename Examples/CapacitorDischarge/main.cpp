@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <sstream>
 
@@ -15,14 +16,13 @@ auto capacitorSystem = [] (auto C, auto R) {
     };
 };
 
+// This function returns a lambda expression that acts as a custom end trigger
+// TODO: THIS IS AN INTERMEDIATE METHOD FOR SOLVING THIS PROBLEM. FINALIZE THE SYNTAX.
 auto endTrigger(double V_end) {
     return [=](auto /*dv*/, auto /*v*/, auto y, auto /*stats*/, auto /*limits*/) -> bool {
         return y[0] <= V_end;
     };
 }
-
-template<typename T>
-struct TD;
 
 int main()
 {
@@ -34,7 +34,7 @@ int main()
     auto p = 0.01;
     auto end = endTrigger(V0*p);
     auto results = epode::solve(
-        capacitorSystem(C, R),   // system parameters: m, L, lambda
+        capacitorSystem(C, R),   // system parameters: C, R
         dt,                                 // Initial step size
         0,                                  // Start time
         end,                                // End Trigger
@@ -42,7 +42,8 @@ int main()
     );
 
     epode::util::resultsToCSV("capacitor_discharge.csv", results);
-    std::cout << "Discharge Time = " << results.back().v << " seconds.\n";
+    std::cout << "Numeric Discharge Time = " << results.back().v << " seconds.\n";
+    std::cout << "Analytic Discharge Time = " << -R * C * std::log(p) << " seconds.\n";
 
     return 0;
 }

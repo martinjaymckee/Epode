@@ -35,7 +35,7 @@ class BS32 : public internal::Adaptive<Value, 3>
 
         using internal::Adaptive<Value, 3>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, value_t y0, auto func) {
+        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
             k0 = func(v0, y0);
         }
 
@@ -92,7 +92,7 @@ class BS45 : public internal::Adaptive<Value, 4>
 
         using internal::Adaptive<Value, 4>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, value_t y0, auto func) {
+        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
             k0 = func(v0, y0);
         }
 

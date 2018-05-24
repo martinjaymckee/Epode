@@ -1,5 +1,6 @@
 \documentclass[letterpaper,10pt]{book}
 %\usepackage{biblatex}
+\usepackage[nottoc,numbib]{tocbibind}
 \usepackage[obeyspaces]{url}
 \usepackage[hidelinks]{hyperref}
 \usepackage[utf8]{inputenc}
@@ -22,6 +23,7 @@
 
 \newmintinline[epodeinline]{cpp}{}
 
+\newcommand{\field}[1]{\textlangle{}\textit{#1}\textrangle{}}
 \newcommand{\srcas}[1]{Available with: \textbf{include} \textlangle{}\textit{#1}\textrangle{}}
 \newcommand{\epode}[0]{\textbf{Epode}}
 
@@ -47,12 +49,17 @@
 \index{All}\index{Apple}\index{Ball}\index{Cherry}\index{ODE}\index{Method}\index{Zoo}
 
     \section{Installation}
+      Because of its header-only nature, there is no specific need to install \epode{}.  One has the option to treat it as a local library and to simply include the files in the project tree of a new application.  This has the advantage that \epode{} version differences can easily be ignored.  The two main disadvantage of this is that, first, it may necessitate writing code to different versions of the library and, second, as a result of keeping to the newest version of the library, bugfixes that are applied to the mainline code will not be available to an application.  The suggestion is, then, to use keep a current version of \epode{} and use it for all development.  While this may require API updates in code at the moment (the \epode{} API is not yet stable), it guarantees that the most effective code is available at all times.   
 
     \section{A Boring Example}
+      Let's take a look at what an \epode{} program might look like.  It's important to realize that this example is not a particularly useful one.  It is designed to demonstrate the simplified API -- using the solve function.  Additionally, the system of equations was not designed to solve any specific problem but, rather, to demonstrate a system of moderate complexity.  A complete program may look like the following:
   \begin{listing}
     \label{lst:basic}
-    \caption{This is how to create and run a solver}  
+    \caption{This is how to create and run a solver, then print the results}  
     \begin{epodecode}
+      #include <iostream>
+      using namespace std;
+      #include <Epode/ode.h>
       using namespace epode;
       using solver_t = epode::integrator::Euler<double, 3>;
       using state_t = typename solver_t::state_t;
@@ -64,8 +71,15 @@
 	}
       } -> state_t;
       auto y0 = state_t{1, 2, 3};
-      auto solver = Solver(0.01); // Step integration variable by 0.01
-      solver(f, 0, {0.5, 1, 1.5, 2}, y0);    
+      auto solver = Solver(0.01);
+      int main(void) {
+	auto results = solver(f, 0, {0.5, 1, 1.5, 2}, y0);    
+	for(auto result: results) {
+	  cout << 't = ' << result.t << '\ty = ' << result.y << '\n';
+	}
+	cout << "\tIteration Steps = " << results.back().stats.steps << "\n";
+	cout << "\tFunction Evals = " << results.back().stats.evals << "\n";
+      }
     \end{epodecode}
   \end{listing}
 
@@ -89,10 +103,22 @@
 \part{The Library in Depth}
   \chapter{Solver Methods}
     \section{Solver API}
-    
-      \subsection{End/Save Syntax}
-	There are multiple ways to denote the points where a solver either ends integration or saves the calculated values
-	
+      \subsection{Control Syntax}
+	There are multiple ways to denote the points where a solver either ends integration or saves the calculated values.  Indeed, the control syntax of the solvers is easily user extensible by passing in new control functions.  In it's most basic usage, it is possible to pass in explicit points which might be used as the end point and as storage points.  These points also lead to the creation of an explicit
+
+	\begin{figure}
+	  \begin{tabular}{c|c|c|c}
+	    \textbf{Syntax} & \textbf{End Trigger} & \textbf{Store Trigger} & \textbf{Limit Trigger}\\
+	    \field{num} & $v \geq num$ & Always & $v = num$\\
+	    \{\field{num}+\} & $v \geq num_{last}$ & Each num & Each num\\
+	    step::uniform(\field{num}, \field{N}) & $v \geq num$ & N calculated points & N calculated points\\
+	    step::until(\field{func}) & $func(\dots{}) = true$ & Always & None\\
+	    step::by\_until(\field{step}, \field{func}) & $func(\dots{}) = true$ & Every $v_{0} + n*step$ & Every $v_{0} + n*step$\\
+	    trigger::custom(\field{end}, \field{store}, (\field{limit})) & $end(\dots()) = true$ & $store(\dots{}) = true$ & $limit(\dots{}) = true$\\
+	  \end{tabular}
+	  \label{fig:control_syntax}
+	\end{figure}
+
       \subsection{Save Transformers}
 	ADD A WAY TO ``TRANSFORM'' THE STATE BEFORE IT IS OUTPUT.  THIS SHOULD ALLOW FOR CHANGING THE SIZE OF THE STATE AS WELL AS DOING SOME NUMBER OF OPERATIONS ON THE STATE BEFORE SAVING IT.
 	
@@ -103,10 +129,11 @@
       
       
     \section{Explicit Methods}
-    
-      EACH OF THE METHODS SHOULD HAVE A DESCRIPTION OF THE METHOD, THE BUTCHERS TABLEAU, AND ANY REFERENCES.  ADDITIONALLY, THE FILE THAT CONTAINS THE IMPLEMENTATION SHOULD BE STATED.
+      The explicit methods currently implemented are generally of the Runge-Kutta type.  For an overview of these types of methods read \cite{butcher1996history}.  The Runge-Kutta methods are arranged roughly in increasing order.  As such, later methods are -- in general -- more accurate than those listed earlier.  For complex problems, this increased accuracy \textit{may} or may not translate into a faster method as it is impossible to make general statements about the computational expense of a problem/method combination without further analysis.  The default method of the ``solve'' function, however, is currently the BS32 method, pending verification of the correctness of the RKF45 method, or something similar.  This method typically provides good accuracy while also providing reasonably fast computation.
       
       \subsection{Forward Euler}   
+	The Forward Euler method of integration is by far the simplest.  It uses only the current state and the derivitive of the state at the current point to extrapolate the state at the next point.  While this makes the method simple to implement and easy to understand, it does lead to an integration method which cannot be both accurate and fast.  If the timestep is made so small that some level of accuracy is attained, the runtime becomes prohibitive.  In any case, the low order of Euler's method makes truly accurate calculations impossible in any case.  The butcher's tableau for Forward Euler is:
+	
 	\[
 	  \begin{array}{c|c}
 	    0 & 0\\
@@ -114,6 +141,8 @@
 	    & 1
 	  \end{array}
 	\]
+	
+	Forward Euler is provided mostly because it can be used as an exceptionally quick to run comparison for a more usable method.
 	
 	\srcas{Euler}
 	
@@ -130,14 +159,12 @@
 	    & 1/512 & 255/256 & 1/512\\
 	  \end{array}
 	\]    
-
+	\epode{} implements the adaptive loop by removing the first evaluation from the loop, as it does not depend upon the timestep.
+	
 	\srcas{RKF}
     	
       \subsection{Generic 2nd-Order Runge-Kutta}
-	IS THERE A GOOD WAY TO MAKE SUCH A PARAMETRIC METHOD?? THIS COULD USE A VALUE PASSED TO THE METHOD'S CONSTRUCTOR
-	
-	TODO: WRITE THE GENERIC 2ND ORDER AND THEN IMPLEMENT HEUN'S, EXPLICIT MIDPOINT AND RALSTON'S USING IT.
-	
+	There are a number of parametrically related second-order Runge-Kutta methods.  This fact is used to create a generic second-order method.  The Butcher's tableau of this generic method is:
 	\[
 	  \begin{array}{c|cc}
 	    0 & & \\
@@ -146,10 +173,12 @@
 	    & 1-1/2\eta & 1/2\eta
 	  \end{array}
 	\]
-
+	There is a single parameter $\eta$ which ranges between zero and one.  Any of these parameter values represents a valid second-order method.  Some of the specific methods have previously been defined and are included below as subclasses of the generic method.  At construction of the method, the parameter $\eta$ is required to be passed to the constructor.  This parameter can simply follow the initial step-size parameter in the solver constructor.
+	
 	\srcas{RK2}
 	    
       \subsection{Heun}
+	Heun's method is a specialization of the generic second-order Runge-Kutta method.
 	\[
 	  \begin{array}{c|cc}
 	    0 & & \\
@@ -159,9 +188,10 @@
 	  \end{array}
 	\]
 
-	Available with: \srcas{RK2}
+	\srcas{RK2}
 	
       \subsection{Midpoint}
+	The Midpoint method is a specialization of the generic second-order Runge-Kutta method.      
 	\[
 	  \begin{array}{c|cc}
 	    0 & & \\
@@ -171,9 +201,10 @@
 	  \end{array}
 	\]    
 
-	Available with: \srcas{RK2}
+	\srcas{RK2}
 	
       \subsection{Ralston's}
+	Ralston's method is a specialization of the generic second-order Runge-Kutta method.      
 	\[
 	  \begin{array}{c|cc}
 	    0 & & \\
@@ -183,14 +214,14 @@
 	  \end{array}
 	\]      
 
-	Available with: \srcas{RK2}
+	\srcas{RK2}
 
       \subsection{Euler/Heun}
     
-    	Available with: \srcas{Euler}
+    	\srcas{Euler}
 
       \subsection{RK3}
-	Available with: \srcas{RK3}
+	\srcas{RK3}
     
     
       \subsection{Bogacki–Shampine 3(2)}
@@ -205,20 +236,34 @@
 	    & 7/24 & 1/4 & 1/3 & 1/8\\
 	  \end{array}
 	\]    
-    	Available with: \srcas{BS32}
+    	\srcas{BS32}
 
     
       \subsection{RK4}
-    	Available with: \srcas{RK4}
+    	\srcas{RK4}
 
     
       \subsection{RKF4(5)}
-	\cite{fehlberg1969low}      
-	Available with: \srcas{RKF}
+	Introduced by Fehlberg in \cite{fehlberg1969low}, the RKF 4(5) method has been used as the default method\footnote{In some cases, related $4^{th}$/$5^{th}$ order methods like the Cash-Karp 4(5) or the Dormand-Prince 4(5) method has been used.  In any case, the RKF 4(5) method is important as representing a very good blend of accuracy and speed in problem-space of ode integration.} in a variety of ODE solvers since it's introduction in the late sixties.  The method has an amortiezed cost of six function evaluations per step and an error of order four.  The method is described by the Butcher's tableau,
+	\[
+	  \begin{array}{c|cccc}
+	    0 & & & &\\
+	    1/2 & 1/2 & & &\\
+	    3/4 & 0 & 3/4 & &\\	    
+	    1 & 2/9 & 1/3 & 4/9 &\\	    
+	    \hline
+	    & 2/9 & 1/3 & 4/9 & 0\\
+	    & 7/24 & 1/4 & 1/3 & 1/8\\
+	  \end{array}
+	\]
+	
+	Because it does not depend upon the timestep, the first evaluation is removed from the adaptation loop and, therefore, additional adaptation steps require only five function evaluations.
+	
+	\srcas{RKF}
     
 
       \subsection{Butcher's 5th}
-	Available with: \srcas{Butchers}
+	\srcas{Butchers}
     
     
     %\section{Implicit Methods}
@@ -227,12 +272,41 @@
   \index{Method}\index{ODE}
     
     \section{Triggers}
+      The ODE integrator works in response to only a few triggers: end, storage and limiting.  In general, all of these triggers are based off of a single end-trigger identifier, though the system does allow for the creation and use of triggers seperately (MAKE THIS ACTUALLY BE TRUE!).  Each of the triggers control a certain action within the integrator and together they allow for control of integration stepping, value storage and integration completion.
+      
+      \subsection{End Trigger}
+	The most basic trigger (and the most visible) in \epode{} is the end trigger.  This is a trigger which defines the circumstances under which integration will end.  In its most basic form, this trigger will end an integration when the variable of integration has reached a certain value.  If one wishes to integrate a system of ODEs from $t=0$ to $t=10$, creating the correct end trigger can be as simple as passing in the number 10.  Internally, this will do the right thing.  Coincidentially, it also will create a limit trigger which constrains the integrator to never go beyond the end point and a storage trigger which will store every integrator step.  A method of specifying the end point which is just as direct is to provide a bracket-delimited initializer list of points.  This list contains points at which the integrator should save the state values.  As well as creating a multi-point storage trigger, this method creates a multi-point limit trigger which ensures that the integrator will estimate as close as possible to the choosen  
     
+      \subsection{Store Trigger}
+	Storage triggers define when an iteration's state will be stored as part of the results set.  In most cases, the default is to store all of the iterations.  Using the simplified API, there is only one case in whtheich a subset of samples are stored -- when an initializer list of points is passed into the iterator (or solve) function.  When this is done the store trigger will store only the iterations which correspond to the steps nearest to the listed points.  Store triggers provide a flexible API which allows for determination of storage based on a variety of model characteristics.  The API looks like:
+	\begin{epodecode}
+	  bool store = storer(dv, v, y, stats)
+	\end{epodecode}
+	A storage trigger can respond to any combination of: the current iteration's variable step, the iteration variable value at the end of the step, the state at the end of the step, or the system statistics (which includes number of method invocations and number of system function executions.
+	
+	Store triggers are designed, primarily, to allow for reasonable subsets of values to be selected at the time of system calculation and, therefore, to save memory in the system.  What this means, of course, is that not all of the calculated information will be returned.  As part of saving the memory and optimizing execution time, a storage transformer may be used to transform the iterator state (dv, v, y, stat) into an alternative state vector which is returned instead.  the advantage of using such a transformer is not only that the state size may be expanded or reduced, but also that functions between multiple state vectors are possible.  The Ballistic Modeling example (\ref{sec:ballistic-modeling}) uses a store transformer to convert from a state which consists of the projectile's velocity and position components into a state containing potential, kinetic and total energy, as well fired distance.
+	
+	NEED TO DEFINE A GOOD WAY TO ADD STORE TRIGGERS SEPERATELY FROM THE END TRIGGER AND LIMIT TRIGGER.
+
+	
+      \subsection{Limit Trigger}
+	Limit triggers cretate the actual step-size limits.  Even in a fixed step-size method, some of the steps can be altered to ensure that the integration limits are respected. Step-size limits are defined as being in a minimum to maximum step range.  The limit trigger takes iteration state as input and returns an object containing those upper and lower limits.  Specifically, the limit trigger is an executable object with the following interface:
+	\begin{epodecode}
+	  auto limits = limiter(dv, v);
+	\end{epodecode}
+	That is, the limit trigger takes both the last step size and the current value of the variable of integration.
+	
+	NOTE: IT MAY MAKE SENSE TO PASS THE STATE VARIABLE INTO THE LIMIT TRIGGER, FOR ADDED FLEXIBILITY (ESPECIALLY WITH CUSTOM TRIGGERS)
+	
     \section{Logging}
     WHILE LOGGING WOULD BE A NICE FEATURE, IT CURRENTLY ISN'T IMPLEMENTED.  FIGURE OUT HOW TO DO THAT AND THEN ADD IT
 
   \chapter{Extension API}
-
+    \section{Extension Methods}
+      It is always possible to implement new methods for use in \epode{}.  The method API is fairly rich (and, potentially, complicated), but it provides for all of the available functionality being accessible to any new methods.
+      
+      DESCRIBE HOW METHODS ARE CREATED. SHOW AN EXAMPLE -- MAKE IT CLEAR THAT IT'S NOT NECESSARILY A GOOD METHOD
+      
   
 \part{Usage Examples}
 
@@ -240,8 +314,25 @@
     SHOULD THE TOY PROBLEMS ALL BE SOLVABLE ANALYTICALLY?
     
     \section{Capacitor Discharge}
-      THIS IS EASY TO SOLVE ANALYTICALLY -- USE END VOLTAGE TRIGGER??? (CUSTOM TRIGGER)
-
+      The dynamics of capacitors in charging and discharging is very simple.  It is also a question which we can easily solve analytically.  This provides us an interesting option to test \epode{}.  We pose a question.  How long does it take for a resistor-capacitor system to discharge from an initial voltage to some proportion of that initial value.  Analytically this problem can be solved as,
+      \begin{equation}
+	t_{discharge} = R Cln(p)
+      \end{equation}
+      where $t_{discharge}$ is the time required to discharge, $R$ is the circuit resistance in ohms, $C$ is the circuit capacitance in farads and $p$ is the ratio of final voltage to initial voltage.  We will use this equation to verify our numerical solution to the problem.
+      
+      What is important to realize with this problem, however, is that the problem specification identifies an end condition which is not based upon the variable of integration -- in this case, time.  As such, we are going to need to use a custom end trigger.  In this case, integration should end when the capacitor voltage drops below $V_{initial}p$, that is the initial voltage times the initial-to-final ratio.
+      
+      The dynamic equation of our RC system can be defined simply as,
+      \begin{equation}
+	\dot{V} = \frac{V}{RC}
+      \end{equation}
+      here we see that there is no direct connection between the time variable and the state of the system.  This makes sense as we would not expect the discharge of a capacitor to be dependant on the time of day or phase of moon.  The start time does not matter.  Because there is a time related rate of voltage change, however, the relative time does matter.
+      
+      THIS SHOULD PROBABLY BE EXTENDED SOME. IN PARTICULAR, THIS IS NOT DESCRIBING ANYTHING ABOUT THE ACTUAL CODE.
+      
+      \subsection{Results}
+      HERE THERE IS A NEED TO GRAPH THE RESULTS AND COMPARE THE \epode{} ESTIMATE WITH THE ANALYTIC SOLUTION.  IN PARTICULAR, IT WOULD BE NICE TO SHOW NUMEROUS METHODS AND COMPARE THE ERRORS IN CALCULATION.
+    
     \section{A Random Complex Valued IVP}
       JUST SOMETHING SIMPLE LIKE $\dot{z} = (z - t)^{2}$
 
@@ -249,12 +340,18 @@
       THIS CAN SHOW A SIMPLE TWO VARIABLE, MODERATELY STIFF SYSTEM
 
   \chapter{Physical Simulation}
-    \section{Ballistic Modeling}
-      Some of the earliest mechanical and electronic computers were created to assist in the calculation of ballistics.  Why not do the same here?
+    \section{Ballistic Modeling}\label{sec:ballistic-modeling}
+      Some of the earliest mechanical and electronic computers were created to assist in the calculation of ballistics.  Why not do the same here?  We are going to use \epode{} to model the possible range of a cannon and refer to \cite{wade2011going} for inspiration.  To begin with, it is important to outline precisely what we are expecting to achieve with this simulation.  In the absence of aerodynamic drag, the equations of motion are very simple.  Drag, as always seems to be the case, complicates the whole situation.  Drag is a dynamic phenomenon and is difficult to estimate accurately.  Cannon balls, however, have one saving grace.  They are spherical.  And spheres are one of the best understood of shapes aerodynamically.  To calculate the drag of cannon balls we will depend upon code found in \cite{yager2014calculating} which introduces drag coefficient estimates for a variety of body shapes.
+      
+      Being a dynamic property, a cannon ball's coeficient of drag is based upon the atmospheric conditions (air density, temperature, etc.) as well as the velocity and surface finish of the cannon ball.  There are a number of methods by which this drag coefficient can be estimated with the technical report mentioned above presenting two distinct methods.  For this simulation we will use the 1972 Krumins method.  This method is based upon both the Reynolds number and Mach number.  This is not the place to get into what these values really refer to, however, Reynolds number describes the relative velocity of a body in relation to the boundary layer size of a fluid, while mach number is the ratio of a body's speed to the speed of sound in a fluid.  Together, the two provide a very general description of dynamic environment of the body.  These two parmeters will be estimated at each time step in order to estimate the coefficient of drag.
+	
+      With coefficeint of drag and a physical description of the cannon ball (radius and mass) it is possible to calculate the acceleration of the ball through free space.  This leads us to consideration of the equations of motion for our simultion. CONTINUE WITH INTRODUCING THE EQUATIONS OF MOTION
+      
+      MUCH MORE HERE....
+      
+      So, even with all this complication, are there things we are forgetting (ignoring)?  Well, of course.  To begin, our simulation will not include consideration of the Magnus force which can create a lifting force on balls which could substantially skew the results we are getting.  As mentioned earlier, there is the surface finish of the cannon ball in flight to consider as well.  As it stands, there are no dials or knobs to twiddle which will give differing results for smooth or rough surfaces.  Similarly, non-ideal spheres are not simulated in any way.  And there is more.  Physical modeling is tricky business.
       
       IT WOULD BE NICE TO DO A BALLISTIC MODEL THAT ALLOWS FOR TESTING WITH AND WITHOUT DRAG.  IS THERE A WAY TO DO THIS IN THE ODE SOLVER, OR IS THAT PART OF THE SYSTEM DESCRIPTION?
-      
-      BASE THIS ON \cite{wade2011going}.
 
     \section{Pendulum}
       Here we will solve a non-linear second-order equation which defines a pendulum with friction\footnote{the \url{https://nrich.maths.org/content/id/6478/Paul-not so simple pendulum 2.pdf}}.  The equation,
@@ -280,7 +377,7 @@
 
       
     \section{Predator/Prey}
-      On the island of ?? there are ??s and ??s.
+      New Zealand contains a triad of species the Kiwi, Rabbit and Stoats which form a linked predator-prey-prey system.  An interesting article \cite{korobeinikov1999global} demonstrates that a simple three-dimensional model of predator-prey behavior leads to the conclusion that one of the prey species will always approach extinction in such a system within a finite time even if there is no direct competition between prey species.  The article approaches this question analytically.  Here we will explore the same question numerically.
       
   \chapter{Chaotic Attractors}
     \section{Lorenz System}

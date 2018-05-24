@@ -37,7 +37,7 @@ class RKF12 : public internal::Adaptive<Value, 1>
 
         using internal::Adaptive<Value, 1>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, value_t y0, auto func) {
+        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
             k0 = func(v0, y0);
         }
 
@@ -87,7 +87,7 @@ class RKF23 : public internal::Adaptive<Value, 2>
 
         using internal::Adaptive<Value, 2>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, value_t y0, auto func) {
+        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
             k0 = func(v0, y0);
         }
 
@@ -143,7 +143,7 @@ class RKF34 : public internal::Adaptive<Value, 3>
 
         using internal::Adaptive<Value, 3>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, value_t y0, auto func) {
+        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
             k0 = func(v0, y0);
         }
 

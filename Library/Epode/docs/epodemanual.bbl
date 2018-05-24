@@ -1,5 +1,10 @@
 \begin{thebibliography}{1}
 
+\bibitem{butcher1996history}
+John~Charles Butcher.
+\newblock A history of runge-kutta methods.
+\newblock {\em Applied numerical mathematics}, 20(3):247--260, 1996.
+
 \bibitem{fehlberg1969low}
 Erwin Fehlberg.
 \newblock Low-order classical runge-kutta formulas with stepsize control and
@@ -12,10 +17,22 @@ Amanda Wade.
 \newblock {\em Undergraduate Journal of Mathematical Modeling: One+ Two},
   4(1):5, 2011.
 
+\bibitem{yager2014calculating}
+Robert~J Yager.
+\newblock Calculating drag coefficients for spheres and other shapes using c++.
+\newblock Technical report, ARMY RESEARCH LAB ABERDEEN PROVING GROUND MD
+  WEAPONS AND MATERIALS RESEARCH DIRECTORATE, 2014.
+
 \bibitem{nelson1986pendulum}
 Robert~A Nelson and MG~Olsson.
 \newblock The pendulum—rich physics from a simple system.
 \newblock {\em American Journal of Physics}, 54(2):112--121, 1986.
+
+\bibitem{korobeinikov1999global}
+Andrei Korobeinikov and Graeme~C Wake.
+\newblock Global properties of the three-dimensional predator-prey
+  lotka-volterra systems.
+\newblock {\em Advances in Decision Sciences}, 3(2):155--162, 1999.
 
 \bibitem{chua1992genesis}
 Leon~O Chua.

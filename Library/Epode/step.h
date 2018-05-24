@@ -43,7 +43,6 @@ struct StepLimits
 
 namespace internal
 {
-
 //
 // Calculate the stepsize scaling for an adaptive method of order N
 //
@@ -53,7 +52,7 @@ struct stepScalingImpl
 {
         template<typename Value>
         constexpr static Value calc(const Value& tolerance, const Value& error) {
-            return pow(abs(error / tolerance), (Value(1) / Value(N-1)));
+            return pow(abs(tolerance / error), (Value(1) / Value(N-1)));
         }
 };
 
@@ -63,7 +62,7 @@ struct stepScalingImpl<1>
 {
         template<typename Value>
         constexpr static Value calc(const Value& tolerance, const Value& error) {
-            return abs(error / tolerance);
+            return abs(tolerance / error);
         }
 };
 
@@ -90,7 +89,7 @@ StepSizeUpdate<Value> updateStepSize(
         ) {
     constexpr auto scale_threshold = Value(1.0);
     const auto error = (z-y).norm();
-    const auto scale = stepScalingImpl<N>::calc(error, tolerance);
+    const auto scale = (error == Value(0)) ? scale_max : stepScalingImpl<N>::calc(tolerance, error);
     return [=]() -> StepSizeUpdate<Value> {
         if(scale < scale_threshold) {
             if(dv <= dv_min) {

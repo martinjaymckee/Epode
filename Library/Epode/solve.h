@@ -28,7 +28,7 @@
 namespace epode
 {
 
-template<typename System, typename State>
+template<template<typename V, size_t N> class Method, typename System, typename State>
 auto solve(System system, auto dv, auto v0, auto end, State y0)
 {
     using system_properties_t = decltype(internal::stateProperties(system(v0, y0)));
@@ -44,17 +44,31 @@ auto solve(System system, auto dv, auto v0, auto end, State y0)
         typename state_properties_t::value_t
     >::type;
 
-    //using Solver = Integrator<value_t, system_properties_t::N, method::Butcher5th>;
-    using Solver = Integrator<value_t, system_properties_t::N, method::RKF12>;
-    //using Solver = Integrator<value_t, system_properties_t::N, method::RKF23>;
-    //using Solver = Integrator<value_t, system_properties_t::N, method::RKF34>;
-    //using Solver = Integrator<value_t, system_properties_t::N, method::RKF45>;
-    //using Solver = Integrator<value_t, system_properties_t::N, method::BS32>;
-    //using Solver = Integrator<value_t, system_properties_t::N, method::BS45>;
+    using Solver = Integrator<value_t, system_properties_t::N, Method>;
 
-    auto solver = Solver(dv, 1e-10);
+    auto solver = Solver(dv, 1e-10); // TODO: FIGURE OUT HOW TO DEFAULT THESE ARGUMENTS BETTER
 
     return solver(system, v0, end, y0);
+}
+
+namespace internal
+{
+//using Solver = Integrator<value_t, system_properties_t::N, method::Butcher5th>;
+//using Solver = Integrator<value_t, system_properties_t::N, method::RKF12>;
+//using Solver = Integrator<value_t, system_properties_t::N, method::RKF23>;
+//using Solver = Integrator<value_t, system_properties_t::N, method::RKF34>;
+//using Solver = Integrator<value_t, system_properties_t::N, method::RKF45>;
+//using Solver = Integrator<value_t, system_properties_t::N, method::BS32>;
+//using Solver = Integrator<value_t, system_properties_t::N, method::BS45>;
+
+template<typename V, size_t N>
+using SolveDefaultMethod = method::BS45<V, N>;
+} /*namespace internal*/
+
+template<typename System, typename State>
+auto solve(System system, auto dv, auto v0, auto end, State y0)
+{
+    return solve<internal::SolveDefaultMethod>(system, dv, v0, end, y0);
 }
 
 } /*namespace epode*/

@@ -21,6 +21,8 @@
 #include <initializer_list>
 #include <vector>
 
+#include <cmath>
+
 #include "core.h"
 #include "step.h"
 #include "triggers.h"
@@ -58,9 +60,6 @@ struct NullOutputTransformer
         }
 };
 } /*namespace internal*/
-
-template<typename T>
-struct TD;
 
 template<typename Value, size_t N, template<typename V, size_t N2> class Method>
 class Integrator
@@ -102,9 +101,7 @@ class Integrator
         template<typename Funcs, typename Transformer=internal::NullOutputTransformer>
         auto operator() (Funcs funcs, value_t v0, auto _end, auto y0,
                              const Transformer& transformer = Transformer{}) {
-            //TD<decltype(_end)> a;
             auto end = triggers::internal::constructEndTrigger<value_t>(_end);
-            //TD<decltype(end)> b;
             auto store = [](auto, auto, auto, auto) {return true;};
             auto limiter = step::internal::constructLimiter<limits_t, value_t>(_end);
 
@@ -159,7 +156,7 @@ class Integrator
 
             auto limits = limiter(dv, v);
 
-//            TD<decltype(end)> a;
+            // DEBUG HACK
             while(!end(dv, v, y, stats, limits)){
                 // Always constrain the integration variable step
                 dv = limits.constrain(dv);
@@ -170,6 +167,12 @@ class Integrator
                 dv = result.dv_next;
                 y = result.y;
                 stats.update(1, result.evals);
+
+             /*   if(std::isnan(dv)) {
+                    std::cout << "limits = [" << limits.min << ", " << limits.max << "], dv = " << result.dv << std::endl;
+                    std::cout << "steps = " << stats.steps << ", evals = " << stats.evals << std::endl;
+                    exit(-1);
+                }*/
 
                 // Store the correctly transformed results of the step, if desired
                 //  TODO: IT MAKES SENSE TO CONSIDER INTERPOLATION HERE....

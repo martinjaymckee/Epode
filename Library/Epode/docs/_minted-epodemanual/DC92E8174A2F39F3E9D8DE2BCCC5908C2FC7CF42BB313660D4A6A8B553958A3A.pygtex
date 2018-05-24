@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+	  \PYG{k+kt}{bool} \PYG{n}{store} \PYG{o}{=} \PYG{n}{storer}\PYG{p}{(}\PYG{n}{dv}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{stats}\PYG{p}{)}
+\end{Verbatim}

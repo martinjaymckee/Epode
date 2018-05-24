@@ -4,6 +4,7 @@
 #include <Eigen/Dense>
 #include <Epode/ode.h>
 #include <Epode/util.h>
+#include <Epode/rkf.h>
 
 using namespace std;
 
