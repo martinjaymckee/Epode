@@ -104,7 +104,7 @@
   \chapter{Solver Methods}
     \section{Solver API}
       \subsection{Control Syntax}
-	There are multiple ways to denote the points where a solver either ends integration or saves the calculated values.  Indeed, the control syntax of the solvers is easily user extensible by passing in new control functions.  In it's most basic usage, it is possible to pass in explicit points which might be used as the end point and as storage points.  These points also lead to the creation of an explicit
+	There are multiple ways to denote the points where a solver either ends integration or saves the calculated values.  Indeed, the control syntax of the solvers is easily user extensible by passing in new control functions.  In it's most basic usage, it is possible to pass in explicit points which might be used as the end point and as storage points.  These points also lead to the creation of a limit 
 
 	\begin{figure}
 	  \begin{tabular}{c|c|c|c}
@@ -119,10 +119,17 @@
 	  \label{fig:control_syntax}
 	\end{figure}
 
-      \subsection{Save Transformers}
-	ADD A WAY TO ``TRANSFORM'' THE STATE BEFORE IT IS OUTPUT.  THIS SHOULD ALLOW FOR CHANGING THE SIZE OF THE STATE AS WELL AS DOING SOME NUMBER OF OPERATIONS ON THE STATE BEFORE SAVING IT.
+      \subsection{Parameters Calculation}
+	IT WOULD BE GOOD TO ADD THE ABILITY TO CALCULATE PARAMETERS WHICH CAN BE USED IN TO CALCULATION OF STATE BUT WHICH ARE NOT IN THE FORM OF DIFFERENCE EQUATIONS.  FOR INSTANCE, IN THE CASE OF A BALLISTICS CALCULATION WITH DRAG, CALCULATION OF THE COEFFICIENT OF DRAG IS NEEDED, BUT IT'S NOT EVOLVING WITH TIME, IT IS DIRECTLY DEPENDANT UPON THE CURRENT STATE.  AS SUCH, IT NEEDS A DIFFERENT APPROACH TO CALCULATE.  WHAT IS A GOOD SYNTAX FOR THIS AND HOW CAN IT BE INTEGRATED INTO THE CURRENT DESIGN WITHOUT COMPLICATING THE API NEEDLESSLY?
 	
-	SYNTAX -- transform(stats, $y_{n}$, $\dot{}v_{n}$, $v_{n}$, $y_{n-1}$)
+      \subsection{Save Transformers}
+	Save transformers are a way to convert the actually calculated state into a different state which is used as a result.  The point of save transformers is primarily to minimize the expense of reaching the correct finals results by folding the transformations into the calculation loop and, potentially, reducing the total memory requirements of the system.  A save transformer has the API:
+	\begin{epodecode}
+	  auto new_state = transformer(dv, v, y, stats);
+	\end{epodecode}
+	Which means that the new state can be based upon the current variable of integration (and integration step), iteration state and iterator statistics.
+	
+	THE QUESTION IS, ``IS THERE ANYTHING ELSE THAT THE SAVE TRANSFORMER COULD, POTENTIALLY, USE WHICH WOULD MAKE IT MORE FLEXIBLE?''
 	
       \subsection{Results Type}
       IT WOULD BE NICE TO MAKE IT POSSIBLE FOR THE RESULTS PACKAGE TO BE OF FIXED SIZE (I.E. NOT A STD::VECTOR) SO THAT DYNAMIC ALLOCATIONS CAN BE AVOIDED).  THIS WILL REQUIRE DEFINING THE RETURN TYPE OF THE INTEGRATOR OPERATOR () BASED ON THE TYPE OF THE STORE TRIGGER.  ONCE THAT WORKS, AS LONG AS THE RETURN TYPES ALL HAVE A SIMILAR API, IT COULD BE A SINGLE VALUE, ARRAY OR VECTOR.
@@ -334,11 +341,28 @@
       HERE THERE IS A NEED TO GRAPH THE RESULTS AND COMPARE THE \epode{} ESTIMATE WITH THE ANALYTIC SOLUTION.  IN PARTICULAR, IT WOULD BE NICE TO SHOW NUMEROUS METHODS AND COMPARE THE ERRORS IN CALCULATION.
     
     \section{A Random Complex Valued IVP}
-      JUST SOMETHING SIMPLE LIKE $\dot{z} = (z - t)^{2}$
+      \begin{equation}
+	$\dot{z} = (z - t)^{2}$
+      \end{equation}
 
+      NOTE THIS IS SHOWING THAT \epode{} CAN WORK WITH COMPLEX VALUED FUNCTIONS... NOTHING ELSE.
+      
     \section{Van der Pol Oscillator}
       THIS CAN SHOW A SIMPLE TWO VARIABLE, MODERATELY STIFF SYSTEM
+      
+      \begin{equation}
+	\mu{} \gte{} 0
+      \end{equation}
 
+      \begin{equation}
+	\dot{x} = y
+      \end{equation}
+      
+      \begin{equation}
+	\dot{y} = \mu{}(1 - x^{2})y - x
+      \end{equation}
+
+      
   \chapter{Physical Simulation}
     \section{Ballistic Modeling}\label{sec:ballistic-modeling}
       Some of the earliest mechanical and electronic computers were created to assist in the calculation of ballistics.  Why not do the same here?  We are going to use \epode{} to model the possible range of a cannon and refer to \cite{wade2011going} for inspiration.  To begin with, it is important to outline precisely what we are expecting to achieve with this simulation.  In the absence of aerodynamic drag, the equations of motion are very simple.  Drag, as always seems to be the case, complicates the whole situation.  Drag is a dynamic phenomenon and is difficult to estimate accurately.  Cannon balls, however, have one saving grace.  They are spherical.  And spheres are one of the best understood of shapes aerodynamically.  To calculate the drag of cannon balls we will depend upon code found in \cite{yager2014calculating} which introduces drag coefficient estimates for a variety of body shapes.
@@ -381,6 +405,24 @@
       
   \chapter{Chaotic Attractors}
     \section{Lorenz System}
+    
+      \begin{equation}
+	\rho{} = 28, \sigma{} = 10, \Beta{} = \frac{8}{3}
+      \end{equation}
+
+      \begin{equation}
+	\dot{x} = \sigma{}(y - x)
+      \end{equation}
+      
+      \begin{equation}
+	\dot{y} = x(\rho{} - z) -y
+      \end{equation}
+      
+      \begin{equation}
+	\dot{z} = xy - \Beta{}z
+      \end{equation}
+
+
     \section{Rossler Attractor}
     \section{Chua's Circuit}
       Chua's circuit was intended to show that a physical electronic circuit could demonstrate chaotic behavior, as documented by Chua himself in~\cite{chua1992genesis}.  The circuit, like the Lorenz system and the Rossler system, is described by an ODE with three state variables.  For this example, we shall use the implementation of the circuit described in~\cite{kennedy1992robust}.

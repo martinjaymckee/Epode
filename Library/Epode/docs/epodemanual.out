@@ -12,47 +12,48 @@
 \BOOKMARK [-1][-]{part.2}{II The Library in Depth}{}% 12
 \BOOKMARK [0][-]{chapter.3}{Solver Methods}{part.2}% 13
 \BOOKMARK [1][-]{section.3.1}{Solver API}{chapter.3}% 14
-\BOOKMARK [2][-]{subsection.3.1.1}{End/Save Syntax}{section.3.1}% 15
-\BOOKMARK [2][-]{subsection.3.1.2}{Save Transformers}{section.3.1}% 16
-\BOOKMARK [2][-]{subsection.3.1.3}{Results Type}{section.3.1}% 17
-\BOOKMARK [1][-]{section.3.2}{Explicit Methods}{chapter.3}% 18
-\BOOKMARK [2][-]{subsection.3.2.1}{Forward Euler}{section.3.2}% 19
-\BOOKMARK [2][-]{subsection.3.2.2}{RKF1\(2\)}{section.3.2}% 20
-\BOOKMARK [2][-]{subsection.3.2.3}{Generic 2nd-Order Runge-Kutta}{section.3.2}% 21
-\BOOKMARK [2][-]{subsection.3.2.4}{Heun}{section.3.2}% 22
-\BOOKMARK [2][-]{subsection.3.2.5}{Midpoint}{section.3.2}% 23
-\BOOKMARK [2][-]{subsection.3.2.6}{Ralston's}{section.3.2}% 24
-\BOOKMARK [2][-]{subsection.3.2.7}{Euler/Heun}{section.3.2}% 25
-\BOOKMARK [2][-]{subsection.3.2.8}{RK3}{section.3.2}% 26
-\BOOKMARK [2][-]{subsection.3.2.9}{Bogacki\205Shampine 3\(2\)}{section.3.2}% 27
-\BOOKMARK [2][-]{subsection.3.2.10}{RK4}{section.3.2}% 28
-\BOOKMARK [2][-]{subsection.3.2.11}{RKF4\(5\)}{section.3.2}% 29
-\BOOKMARK [2][-]{subsection.3.2.12}{Butcher's 5th}{section.3.2}% 30
-\BOOKMARK [0][-]{chapter.4}{The Integrator Process}{part.2}% 31
-\BOOKMARK [1][-]{section.4.1}{Triggers}{chapter.4}% 32
-\BOOKMARK [2][-]{subsection.4.1.1}{End Trigger}{section.4.1}% 33
-\BOOKMARK [2][-]{subsection.4.1.2}{Store Trigger}{section.4.1}% 34
-\BOOKMARK [2][-]{subsection.4.1.3}{Limit Trigger}{section.4.1}% 35
-\BOOKMARK [1][-]{section.4.2}{Logging}{chapter.4}% 36
-\BOOKMARK [0][-]{chapter.5}{Extension API}{part.2}% 37
-\BOOKMARK [1][-]{section.5.1}{Extension Methods}{chapter.5}% 38
-\BOOKMARK [-1][-]{part.3}{III Usage Examples}{}% 39
-\BOOKMARK [0][-]{chapter.6}{Toy Problems}{part.3}% 40
-\BOOKMARK [1][-]{section.6.1}{Capacitor Discharge}{chapter.6}% 41
-\BOOKMARK [2][-]{subsection.6.1.1}{Results}{section.6.1}% 42
-\BOOKMARK [1][-]{section.6.2}{A Random Complex Valued IVP}{chapter.6}% 43
-\BOOKMARK [1][-]{section.6.3}{Van der Pol Oscillator}{chapter.6}% 44
-\BOOKMARK [0][-]{chapter.7}{Physical Simulation}{part.3}% 45
-\BOOKMARK [1][-]{section.7.1}{Ballistic Modeling}{chapter.7}% 46
-\BOOKMARK [1][-]{section.7.2}{Pendulum}{chapter.7}% 47
-\BOOKMARK [1][-]{section.7.3}{Predator/Prey}{chapter.7}% 48
-\BOOKMARK [0][-]{chapter.8}{Chaotic Attractors}{part.3}% 49
-\BOOKMARK [1][-]{section.8.1}{Lorenz System}{chapter.8}% 50
-\BOOKMARK [1][-]{section.8.2}{Rossler Attractor}{chapter.8}% 51
-\BOOKMARK [1][-]{section.8.3}{Chua's Circuit}{chapter.8}% 52
-\BOOKMARK [-1][-]{part.4}{IV Appendicies}{}% 53
-\BOOKMARK [0][-]{chapter.9}{Basics of ODEs}{part.4}% 54
-\BOOKMARK [0][-]{chapter.10}{Analysis of Numeric Methods}{part.4}% 55
-\BOOKMARK [0][-]{chapter.11}{Troubleshooting}{part.4}% 56
-\BOOKMARK [0][-]{chapter.12}{Bibliography}{part.4}% 57
-\BOOKMARK [0][-]{chapter.12}{Index}{part.4}% 58
+\BOOKMARK [2][-]{subsection.3.1.1}{Control Syntax}{section.3.1}% 15
+\BOOKMARK [2][-]{subsection.3.1.2}{Parameters Calculation}{section.3.1}% 16
+\BOOKMARK [2][-]{subsection.3.1.3}{Save Transformers}{section.3.1}% 17
+\BOOKMARK [2][-]{subsection.3.1.4}{Results Type}{section.3.1}% 18
+\BOOKMARK [1][-]{section.3.2}{Explicit Methods}{chapter.3}% 19
+\BOOKMARK [2][-]{subsection.3.2.1}{Forward Euler}{section.3.2}% 20
+\BOOKMARK [2][-]{subsection.3.2.2}{RKF1\(2\)}{section.3.2}% 21
+\BOOKMARK [2][-]{subsection.3.2.3}{Generic 2nd-Order Runge-Kutta}{section.3.2}% 22
+\BOOKMARK [2][-]{subsection.3.2.4}{Heun}{section.3.2}% 23
+\BOOKMARK [2][-]{subsection.3.2.5}{Midpoint}{section.3.2}% 24
+\BOOKMARK [2][-]{subsection.3.2.6}{Ralston's}{section.3.2}% 25
+\BOOKMARK [2][-]{subsection.3.2.7}{Euler/Heun}{section.3.2}% 26
+\BOOKMARK [2][-]{subsection.3.2.8}{RK3}{section.3.2}% 27
+\BOOKMARK [2][-]{subsection.3.2.9}{Bogacki\205Shampine 3\(2\)}{section.3.2}% 28
+\BOOKMARK [2][-]{subsection.3.2.10}{RK4}{section.3.2}% 29
+\BOOKMARK [2][-]{subsection.3.2.11}{RKF4\(5\)}{section.3.2}% 30
+\BOOKMARK [2][-]{subsection.3.2.12}{Butcher's 5th}{section.3.2}% 31
+\BOOKMARK [0][-]{chapter.4}{The Integrator Process}{part.2}% 32
+\BOOKMARK [1][-]{section.4.1}{Triggers}{chapter.4}% 33
+\BOOKMARK [2][-]{subsection.4.1.1}{End Trigger}{section.4.1}% 34
+\BOOKMARK [2][-]{subsection.4.1.2}{Store Trigger}{section.4.1}% 35
+\BOOKMARK [2][-]{subsection.4.1.3}{Limit Trigger}{section.4.1}% 36
+\BOOKMARK [1][-]{section.4.2}{Logging}{chapter.4}% 37
+\BOOKMARK [0][-]{chapter.5}{Extension API}{part.2}% 38
+\BOOKMARK [1][-]{section.5.1}{Extension Methods}{chapter.5}% 39
+\BOOKMARK [-1][-]{part.3}{III Usage Examples}{}% 40
+\BOOKMARK [0][-]{chapter.6}{Toy Problems}{part.3}% 41
+\BOOKMARK [1][-]{section.6.1}{Capacitor Discharge}{chapter.6}% 42
+\BOOKMARK [2][-]{subsection.6.1.1}{Results}{section.6.1}% 43
+\BOOKMARK [1][-]{section.6.2}{A Random Complex Valued IVP}{chapter.6}% 44
+\BOOKMARK [1][-]{section.6.3}{Van der Pol Oscillator}{chapter.6}% 45
+\BOOKMARK [0][-]{chapter.7}{Physical Simulation}{part.3}% 46
+\BOOKMARK [1][-]{section.7.1}{Ballistic Modeling}{chapter.7}% 47
+\BOOKMARK [1][-]{section.7.2}{Pendulum}{chapter.7}% 48
+\BOOKMARK [1][-]{section.7.3}{Predator/Prey}{chapter.7}% 49
+\BOOKMARK [0][-]{chapter.8}{Chaotic Attractors}{part.3}% 50
+\BOOKMARK [1][-]{section.8.1}{Lorenz System}{chapter.8}% 51
+\BOOKMARK [1][-]{section.8.2}{Rossler Attractor}{chapter.8}% 52
+\BOOKMARK [1][-]{section.8.3}{Chua's Circuit}{chapter.8}% 53
+\BOOKMARK [-1][-]{part.4}{IV Appendicies}{}% 54
+\BOOKMARK [0][-]{chapter.9}{Basics of ODEs}{part.4}% 55
+\BOOKMARK [0][-]{chapter.10}{Analysis of Numeric Methods}{part.4}% 56
+\BOOKMARK [0][-]{chapter.11}{Troubleshooting}{part.4}% 57
+\BOOKMARK [0][-]{chapter.12}{Bibliography}{part.4}% 58
+\BOOKMARK [0][-]{chapter.12}{Index}{part.4}% 59

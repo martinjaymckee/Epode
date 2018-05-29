@@ -31,6 +31,8 @@ class Butcher5th : public internal::Fixed<Value, 5>
         using state_t = internal::State<value_t, N>;
         using return_t = internal::MethodReturn<value_t, state_t>;
 
+        using internal::Fixed<Value, 5>::Fixed; // Inherit Construtors
+
         return_t operator () (auto func, value_t dv, value_t v, state_t y, auto) {
             constexpr auto c0 = value_t(1) / value_t(4);
             constexpr auto c1 = value_t(1) / value_t(8);

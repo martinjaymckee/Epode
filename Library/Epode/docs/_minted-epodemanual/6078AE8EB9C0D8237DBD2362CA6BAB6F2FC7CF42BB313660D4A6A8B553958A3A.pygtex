@@ -1,0 +1,3 @@
+\begin{Verbatim}[commandchars=\\\{\},codes={\catcode`\$=3\catcode`\^=7\catcode`\_=8}]
+	  \PYG{k}{auto} \PYG{n}{new\PYGZus{}state} \PYG{o}{=} \PYG{n}{transformer}\PYG{p}{(}\PYG{n}{dv}\PYG{p}{,} \PYG{n}{v}\PYG{p}{,} \PYG{n}{y}\PYG{p}{,} \PYG{n}{stats}\PYG{p}{);}
+\end{Verbatim}

@@ -20,8 +20,6 @@
 #define EPODE_SOLVE_H
 
 #include "bogacki_shampine.h"
-#include "butcher.h" // TODO: THE DEFAULT SOLVER SHOULD BECOME RKF45 EVENTUALLY
-#include "rkf.h"
 #include "core.h"
 #include "integrator.h"
 
@@ -46,21 +44,17 @@ auto solve(System system, auto dv, auto v0, auto end, State y0)
 
     using Solver = Integrator<value_t, system_properties_t::N, Method>;
 
-    auto solver = Solver(dv, 1e-10); // TODO: FIGURE OUT HOW TO DEFAULT THESE ARGUMENTS BETTER
+    // TODO: FIGURE OUT HOW TO DEFAULT THESE ARGUMENTS BETTER
+    // TODO: THE TOLERANCE VALUE SHOULD ONLY BE PASSED TO ADAPTIVE METHODS
+    auto solver = Solver(dv, 1e-10);
 
     return solver(system, v0, end, y0);
 }
 
 namespace internal
 {
-//using Solver = Integrator<value_t, system_properties_t::N, method::Butcher5th>;
-//using Solver = Integrator<value_t, system_properties_t::N, method::RKF12>;
-//using Solver = Integrator<value_t, system_properties_t::N, method::RKF23>;
-//using Solver = Integrator<value_t, system_properties_t::N, method::RKF34>;
-//using Solver = Integrator<value_t, system_properties_t::N, method::RKF45>;
-//using Solver = Integrator<value_t, system_properties_t::N, method::BS32>;
-//using Solver = Integrator<value_t, system_properties_t::N, method::BS45>;
-
+// TODO: EVENTUALLY THIS SHOULD BE REPLACED WITH A METAFUNCTION THAT CALCULATES THE "BEST" METHOD
+//  BASED UPON WHATEVER INFORMATION IS AVAILABLE THROUGH THE "SOLVE" FUNCTION PARAMETERS.
 template<typename V, size_t N>
 using SolveDefaultMethod = method::BS45<V, N>;
 } /*namespace internal*/
