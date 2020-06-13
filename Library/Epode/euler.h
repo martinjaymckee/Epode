@@ -28,7 +28,8 @@ class Euler : public internal::Fixed<Value, 1>
         using state_t = internal::State<value_t, N>;
         using return_t = internal::MethodReturn<value_t, state_t>;
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y, auto) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y, Limiter) {
             return return_t{dv, dv, y + dv * func(v, y), 1};
         }
 };
@@ -41,7 +42,10 @@ class HeunEuler : public internal::Adaptive<Value, 1>
         using state_t = internal::State<value_t, N>;
         using return_t = internal::MethodReturn<value_t, state_t>;
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+        using internal::Adaptive<Value, 1>::Adaptive; // Inherit Construtors
+
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y0, Limiter limiter) {
             constexpr auto c0 = value_t(1) / value_t(2);
 
             const auto k0 = func(v, y0);

@@ -74,14 +74,28 @@ class Integrator
         using stats_t = internal::IntegratorStatistics;
 
     public:
+		template<typename Funcs, typename Results>
+		struct IntegratorLoopState
+		{
+			value_t dv;
+			value_t v;
+			Funcs funcs;
+			state_t y;
+			stats_t stats = stats_t{};
+			Results results;
+			limits_t limits;
+			method_t method;
+			bool complete = false;
+		};
 
-        Integrator(value_t _dv0, auto... args) : dv0(_dv0), method(args...) {}
+		template<typename... Args>
+        Integrator(value_t _dv0, Args... args) : dv0(_dv0), method(args...) {}
 
-        template<typename Funcs, typename Transformer=internal::NullOutputTransformer>
+        template<typename Funcs, typename YState, typename Transformer=internal::NullOutputTransformer>
         auto operator() (Funcs funcs,
                              value_t v0,
                              std::initializer_list<value_t> _end,
-                             auto y0,
+                             YState y0,
                              const Transformer& transformer = Transformer{}) {
             auto end = triggers::internal::constructEndTrigger<value_t>(_end);
             auto store = [](auto, auto, auto, auto) {return true;};
@@ -98,8 +112,8 @@ class Integrator
             );
         }
 
-        template<typename Funcs, typename Transformer=internal::NullOutputTransformer>
-        auto operator() (Funcs funcs, value_t v0, auto _end, auto y0,
+        template<typename Funcs, typename Ender, typename YState, typename Transformer=internal::NullOutputTransformer>
+        auto operator() (Funcs funcs, value_t v0, Ender _end, YState y0,
                              const Transformer& transformer = Transformer{}) {
             auto end = triggers::internal::constructEndTrigger<value_t>(_end);
             auto store = [](auto, auto, auto, auto) {return true;};
@@ -115,6 +129,30 @@ class Integrator
                 transformer // Storage Transformer Type
             );
         }
+
+		template<typename Funcs, typename Transformer>
+		auto initializeLoopState(
+			Funcs funcs,
+			value_t v0, state_t y0,
+			Transformer transformer) {
+			using transformed_state_t = decltype(transformer(value_t{}, value_t{}, state_t{}, stats_t{}));
+			using point_t = internal::StepPoint<value_t, transformed_state_t, stats_t>;
+			using results_t = std::vector<point_t>;
+
+			IntegratorLoopState<Funcs, results_t, limits_t> state;
+			state.dv = dv0;
+			state.v = v0;
+			state.y = y0;
+			state.funcs = funcs;
+			state.method = method; // COPY FROM THE CONSTRUCTED METHOD
+			
+
+			auto f0 = std::get<0>(funcs);
+			initMethod(state.dv, state.v, state.y, f0, state.method);
+
+			return state;
+		}
+
 
     protected:
         //
@@ -124,21 +162,25 @@ class Integrator
         template<typename V, typename S, typename... Ts>
         void initMethod(V, V, S, Ts...) {}
 
-        template<typename V, typename S>
-        auto initMethod(V dv, V v, S y, auto _func, auto _method)
+        template<typename V, typename S, typename Func, typename Method>
+        auto initMethod(V dv, V v, S y, Func _func, Method _method)
         -> decltype(_method.init(dv, v, y, _func)) {
             return _method.init(dv, v, y, _func);
         }
 
+		//
+		// The LoopStateInitialization
+		//
+
         //
         // The generic call operator which contains the implementaion.
         //
-        template<typename Funcs>
+        template<typename Funcs, typename Ender, typename Storer, typename Limiter, typename Transformer>
         auto operator() (
                 Funcs funcs,
                 value_t v0, state_t y0,
-                auto end, auto store, auto limiter,
-                auto transformer) {
+                Ender end, Storer store, Limiter limiter,
+                Transformer transformer) {
             using transformed_state_t = decltype(transformer(value_t{}, value_t{}, state_t{}, stats_t{}));
             using point_t = internal::StepPoint<value_t, transformed_state_t, stats_t>;
             using return_t = std::vector<point_t>;
@@ -180,7 +222,7 @@ class Integrator
                 //  MORE DATA, BUT, IT WOULD MAKE IT POSSIBLE TO GET A DENSE OUTPUT WITH LESS
                 //  COMPUTATIONAL EFFORT -- NOT A BAD THING.  AS A BASE LINE, IT WOULD BE POSSIBLE
                 //  TO DO A THIRD ORDER INTERPOLATION USING JUST THE BEGIN AND END POINTS AND THEIR
-                //  SLOPES.  WITH THE MID-POINT ALSO, IT WOULD BE POSSIBLE TO DO A QUINTIC
+                //  SLOPES.  WITH THE MID-POINT ALSO, IT WOULD BE POSSIBLE TO DO A QUARTIC
                 //  (4TH ORDER) INTERPOLATION.  IT SEEMS THAT THESE TWO OPTIONS ARE REASONABLE TO
                 //  CONSIDER AND IMPLEMENT (AS A START). THERE NEEDS TO BE API IN PLACE TO CONTROL
                 //  THE DENSITY OF THE OUTPUT THOUGH....

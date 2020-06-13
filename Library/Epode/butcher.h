@@ -33,7 +33,8 @@ class Butcher5th : public internal::Fixed<Value, 5>
 
         using internal::Fixed<Value, 5>::Fixed; // Inherit Construtors
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y, auto) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y, Limiter) {
             constexpr auto c0 = value_t(1) / value_t(4);
             constexpr auto c1 = value_t(1) / value_t(8);
             constexpr auto c2 = value_t(1) / value_t(2);

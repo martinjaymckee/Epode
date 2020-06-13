@@ -41,7 +41,8 @@ class GenericRK2 : public internal::Fixed<Value, 2>
               c1(value_t(1) - c2)
         {}
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y, auto) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y, Limiter) {
             const auto k0 = func(v, y);
             const auto k1 = func(v+(c0*dv), y+(c0*dv*k0));
             return return_t{dv, dv, y + (dv * (c1*k0 + c2*k1)), 2};

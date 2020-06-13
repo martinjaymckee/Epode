@@ -36,8 +36,9 @@ inline Value lastInitElement(std::initializer_list<Value> _init) {
     return last;
 }
 
+template<typename Results>
 bool resultsToCSV(
-        const std::string& filename, auto results,
+        const std::string& filename, Results results,
         const std::string& header = std::string()
         ) {
     auto file = std::ofstream{};

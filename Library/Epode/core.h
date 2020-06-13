@@ -41,15 +41,21 @@ struct StateProperties {
         static constexpr size_t N = static_cast<size_t>(_N);
 };
 
-template<typename Value, int N>
-constexpr auto stateProperties(const Eigen::Matrix<Value, 1, N>&) {
+template<typename Value, int N, int _Options, int _MaxRows, int _MaxCols>
+constexpr auto stateProperties(const Eigen::Matrix<Value, 1, N, _Options, _MaxRows, _MaxCols>&) {
     return StateProperties<Value, N>{};
 }
 
-template<typename Value, int N>
-constexpr auto stateProperties(Eigen::Matrix<Value, 1, N>&) {
+template<typename Value, int N, int _Options, int _MaxRows, int _MaxCols>
+constexpr auto stateProperties(Eigen::Matrix<Value, 1, N, _Options, _MaxRows, _MaxCols>&) {
     return StateProperties<Value, N>{};
 }
+
+// NOTE: THE FINAL THREE PARAMETERS IN THE STATEPROPERTIES FUNCTION
+//	(_OPTIONS, _MAXROWS, _MAXCOLS) 
+//	MUST BE INCLUDED OR THE CODE FAILS TO DEDUCE CORRECTLY.  FIGURE OUT IF THIS IS
+//	A C++ COMPLIANCE THING OR IF IT IS SOMETHING THAT VISUAL STUDIO DOES.  IT CERTAINLY
+//	WORKED FINE WITHOUT SPECIFYING THEM UNDER GCC.
 
 template<typename Value, typename State>
 struct MethodReturn

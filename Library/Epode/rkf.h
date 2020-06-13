@@ -37,11 +37,13 @@ class RKF12 : public internal::Adaptive<Value, 1>
 
         using internal::Adaptive<Value, 1>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
+		template<typename Func>
+        void init(value_t /*dv*/, value_t v0, state_t y0, Func func) {
             k0 = func(v0, y0);
         }
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y0, Limiter limiter) {
             constexpr auto c0 = value_t(1) / value_t(2);
             constexpr auto c1 = value_t(1) / value_t(256);
             constexpr auto c2 = value_t(255) / value_t(256);
@@ -87,11 +89,13 @@ class RKF23 : public internal::Adaptive<Value, 2>
 
         using internal::Adaptive<Value, 2>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
+		template<typename Func>
+        void init(value_t /*dv*/, value_t v0, state_t y0, Func func) {
             k0 = func(v0, y0);
         }
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y0, Limiter limiter) {
             constexpr auto c0 = value_t(1) / value_t(4);
             constexpr auto c1 = value_t(27) / value_t(40);
             constexpr auto c2 = value_t(-189) / value_t(800);
@@ -143,11 +147,13 @@ class RKF34 : public internal::Adaptive<Value, 3>
 
         using internal::Adaptive<Value, 3>::Adaptive; // Inherit Construtors
 
-        void init(value_t /*dv*/, value_t v0, state_t y0, auto func) {
+		template<typename Func>
+        void init(value_t /*dv*/, value_t v0, state_t y0, Func func) {
             k0 = func(v0, y0);
         }
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y0, Limiter limiter) {
             constexpr auto c0 = value_t(1) / value_t(4);
             constexpr auto c1 = value_t(4) / value_t(9);
             constexpr auto c2 = value_t(4) / value_t(81);
@@ -205,7 +211,8 @@ class RKF45 : public internal::Adaptive<Value, 4>
 
         using internal::Adaptive<Value, 4>::Adaptive; // Inherit Construtors
 
-        return_t operator () (auto func, value_t dv, value_t v, state_t y0, auto limiter) {
+		template<typename Func, typename Limiter>
+        return_t operator () (Func func, value_t dv, value_t v, state_t y0, Limiter limiter) {
             constexpr auto c0 = value_t(1) / value_t(4);
             constexpr auto c1 = value_t(3) / value_t(8);
             constexpr auto c2 = value_t(3) / value_t(32);

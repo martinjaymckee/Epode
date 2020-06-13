@@ -80,10 +80,10 @@ struct StepSizeUpdate {
         /*const*/ Value dv;
 };
 
-template<size_t N, typename Value>
+template<size_t N, typename Value, typename StateY, typename StateZ>
 StepSizeUpdate<Value> updateStepSize(
             const Value& dv, const Value& dv_min,
-            auto y, auto z, const Value& tolerance,
+            const StateY& y, const StateZ& z, const Value& tolerance,
             const Value& scale_min = Value(0.33),
             const Value& scale_max = Value(3.0)
         ) {

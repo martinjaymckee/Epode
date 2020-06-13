@@ -20,14 +20,38 @@
 #define EPODE_SOLVE_H
 
 #include "bogacki_shampine.h"
+#include "euler.h"
 #include "core.h"
 #include "integrator.h"
 
 namespace epode
 {
+namespace internal
+{
+template<typename Solver, bool adaptive>
+struct SolverConstructImpl
+{
+	template<typename V0, typename V1>
+	static Solver construct(V0 dv, V1 tol) { 
+		std::cout << "Construct Adaptive\n";
+		return { dv, tol }; 
+	}
+};
 
-template<template<typename V, size_t N> class Method, typename System, typename State>
-auto solve(System system, auto dv, auto v0, auto end, State y0)
+template<typename Solver>
+struct SolverConstructImpl<Solver, false>
+{
+	template<typename V0, typename V1>
+	static Solver construct(V0 dv, V1) { 
+		std::cout << "Construct Fixed\n";
+		return { dv }; 
+	}
+};
+
+}
+
+template<template<typename V, size_t N> class Method, typename System, typename DValue, typename Value, typename Ender, typename State>
+auto solve(System system, DValue dv, Value v0, Ender end, State y0)
 {
     using system_properties_t = decltype(internal::stateProperties(system(v0, y0)));
     using state_properties_t = decltype(internal::stateProperties(y0));
@@ -43,10 +67,7 @@ auto solve(System system, auto dv, auto v0, auto end, State y0)
     >::type;
 
     using Solver = Integrator<value_t, system_properties_t::N, Method>;
-
-    // TODO: FIGURE OUT HOW TO DEFAULT THESE ARGUMENTS BETTER
-    // TODO: THE TOLERANCE VALUE SHOULD ONLY BE PASSED TO ADAPTIVE METHODS
-    auto solver = Solver(dv, 1e-10);
+	auto solver = internal::SolverConstructImpl<Solver, Solver::method_t::adaptive>::construct(dv, 1e-6);
 
     return solver(system, v0, end, y0);
 }
@@ -56,11 +77,11 @@ namespace internal
 // TODO: EVENTUALLY THIS SHOULD BE REPLACED WITH A METAFUNCTION THAT CALCULATES THE "BEST" METHOD
 //  BASED UPON WHATEVER INFORMATION IS AVAILABLE THROUGH THE "SOLVE" FUNCTION PARAMETERS.
 template<typename V, size_t N>
-using SolveDefaultMethod = method::BS45<V, N>;
+using SolveDefaultMethod = method::HeunEuler<V, N>; // BS45<V, N>;
 } /*namespace internal*/
 
-template<typename System, typename State>
-auto solve(System system, auto dv, auto v0, auto end, State y0)
+template<typename System, typename DValue, typename Value, typename Ender, typename State>
+auto solve(System system, DValue dv, Value v0, Ender end, State y0)
 {
     return solve<internal::SolveDefaultMethod>(system, dv, v0, end, y0);
 }
