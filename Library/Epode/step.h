@@ -28,7 +28,7 @@ struct StepLimits
 {
         using value_t = Value;
 
-        StepLimits(const value_t& _max = value_t(1e6), const value_t& _min = value_t(1e-6))
+        StepLimits(const value_t& _max = value_t(1e6), const value_t& _min = value_t(1e-3))
             : max(_max), min(_min) {}
 
         constexpr value_t constrain(const value_t& dv) const {

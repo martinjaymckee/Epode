@@ -163,7 +163,7 @@ class Integrator
         void initMethod(V, V, S, Ts...) {}
 
         template<typename V, typename S, typename Func, typename Method>
-        auto initMethod(V dv, V v, S y, Func _func, Method _method)
+        auto initMethod(V dv, V v, S y, Func _func, Method& _method)
         -> decltype(_method.init(dv, v, y, _func)) {
             return _method.init(dv, v, y, _func);
         }
@@ -193,8 +193,10 @@ class Integrator
             auto f0 = std::get<0>(funcs);
             auto y = y0;
             auto v = v0;
-
+			//std::cout << "y0 = " << y0 << '\n';
+			//std::cout << "y = " << y << '\n';
             initMethod(dv, v, y, f0, method);
+			//std::cout << "y (after init) = " << y << '\n';
 
             auto limits = limiter(dv, v);
 
@@ -208,7 +210,10 @@ class Integrator
                 v += result.dv;
                 dv = result.dv_next;
                 y = result.y;
-                stats.update(1, result.evals);
+				//std::cout << "y (first iteration) = " << y << '\n';
+				//exit(-1);
+				stats.update(1, result.evals);
+				//std::cout << "dv = " << dv << "\n";
 
              /*   if(std::isnan(dv)) {
                     std::cout << "limits = [" << limits.min << ", " << limits.max << "], dv = " << result.dv << std::endl;

@@ -5,9 +5,13 @@
 #include <Epode/ode.h>
 #include <Epode/util.h>
 #include <Epode/rkf.h>
+#include <Epode/rk2.h>
+#include <Epode/butcher.h>
+#include <Epode/bogacki_shampine.h>
 
 using namespace std;
-
+template<typename V, size_t N>
+using method_t = epode::method::BS45<V, N>;
 using State = Eigen::Matrix<double, 1, 2>;
 
 auto pendulumSystem = [](auto m, auto L, auto lambda) {
@@ -43,7 +47,7 @@ std::string header(int idx, Lambda lambda) {
 
 int main()
 {
-	auto dt = 0.01;
+	auto dt = 0.001;
 	auto t_end = 2;
 	auto y0 = State{ 0, .35 }; // rad/s, rad
 	auto lambda_min = 0;
@@ -57,12 +61,13 @@ int main()
 	for (int idx = 0; idx < N; ++idx) {
 		auto lambda = lambda_min + (idx * lambda_step);
 
-		auto results = epode::solve(
+		auto results = epode::solve<method_t>(
 			pendulumSystem(1.0, 0.1, lambda),   // system parameters: m, L, lambda
 			dt,                                 // Initial step size
 			0,                                  // Start time
 			t_end,                              // End time
-			y0                                  // Initial system state
+			y0,                                 // Initial system state
+			1e-10							    // Error Tolerance
 		);
 
 		epode::util::resultsToCSV(filename(idx), results, header(idx, lambda));

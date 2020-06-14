@@ -49,12 +49,12 @@ class RKF12 : public internal::Adaptive<Value, 1>
             constexpr auto c2 = value_t(255) / value_t(256);
             constexpr auto c3 = value_t(1) / value_t(512);
 
-            size_t evals = 0;
+			size_t evals = 0;
 
             auto y1 = y0;
             auto dv_next = dv;
             bool done = false;
-            state_t k2{};
+			state_t k2{};
 
             do {
                 dv = limiter.constrain(dv_next);
@@ -64,10 +64,11 @@ class RKF12 : public internal::Adaptive<Value, 1>
                 evals += 2;
 
                 const auto z1 = y0 + dv*(c3*(k0+k2) + c2*k1);
-                const auto update = step::internal::updateStepSize<1>(
+
+				const auto update = step::internal::updateStepSize<1>(
                             dv, limiter.min, y1, z1, this->tolerance
                     );
-                done = update.done;
+				done = update.done;
                 dv_next = update.dv;
             } while(!done);
 
@@ -274,4 +275,3 @@ class RKF45 : public internal::Adaptive<Value, 4>
 } /*namespace epode*/
 
 #endif // EPODE_RKF_H
-
