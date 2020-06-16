@@ -74,12 +74,11 @@ class Integrator
         using stats_t = internal::IntegratorStatistics;
 
     public:
-		template<typename Funcs, typename Results>
+		template<typename Results>
 		struct IntegratorLoopState
 		{
 			value_t dv;
 			value_t v;
-			Funcs funcs;
 			state_t y;
 			stats_t stats = stats_t{};
 			Results results;
@@ -139,13 +138,12 @@ class Integrator
 			using point_t = internal::StepPoint<value_t, transformed_state_t, stats_t>;
 			using results_t = std::vector<point_t>;
 
-			IntegratorLoopState<Funcs, results_t, limits_t> state;
+			IntegratorLoopState<results_t> state;
 			state.dv = dv0;
 			state.v = v0;
 			state.y = y0;
-			state.funcs = funcs;
 			state.method = method; // COPY FROM THE CONSTRUCTED METHOD
-			
+
 
 			auto f0 = std::get<0>(funcs);
 			initMethod(state.dv, state.v, state.y, f0, state.method);
@@ -153,6 +151,29 @@ class Integrator
 			return state;
 		}
 
+    template<typename Results, typename Funcs, typename Storer, typename Limiter, typename Transformer>
+    auto loopIteration ( IntegratorLoopState<Results> _state, Funcs funcs, Storer _store, Limiter _limiter, Transformer _transformer) {
+		auto f0 = std::get<0>(funcs);
+
+		// Always constrain the integration variable step
+		_state.dv = _state.limits.constrain(_state.dv);
+
+		// Do a step of the selected integration method and update the integration state
+		const auto result = _state.method(f0, _state.dv, _state.v, _state.y, _state.limits);
+		_state.v += result.dv;
+		_state.dv = result.dv_next;
+		_state.y = result.y;
+		_state.stats.update(1, result.evals);
+
+		if(_store(result.dv, _state.v, _state.y, _state.stats)){
+			const auto y_transformed = _transformer(result.dv, _state.v, _state.y, _state.stats);
+			_state.results.emplace_back(result.dv, _state.v, y_transformed, _state.stats);
+		}
+
+		// Update the integration variable limits
+		_state.limits = _limiter(_state.dv, _state.v);
+		return _state;
+    }
 
     protected:
         //
@@ -168,10 +189,6 @@ class Integrator
             return _method.init(dv, v, y, _func);
         }
 
-		//
-		// The LoopStateInitialization
-		//
-
         //
         // The generic call operator which contains the implementaion.
         //
@@ -181,7 +198,8 @@ class Integrator
                 value_t v0, state_t y0,
                 Ender end, Storer store, Limiter limiter,
                 Transformer transformer) {
-            using transformed_state_t = decltype(transformer(value_t{}, value_t{}, state_t{}, stats_t{}));
+
+            /*using transformed_state_t = decltype(transformer(value_t{}, value_t{}, state_t{}, stats_t{}));
             using point_t = internal::StepPoint<value_t, transformed_state_t, stats_t>;
             using return_t = std::vector<point_t>;
 
@@ -200,7 +218,6 @@ class Integrator
 
             auto limits = limiter(dv, v);
 
-            // DEBUG HACK
             while(!end(dv, v, y, stats, limits)){
                 // Always constrain the integration variable step
                 dv = limits.constrain(dv);
@@ -215,11 +232,11 @@ class Integrator
 				stats.update(1, result.evals);
 				//std::cout << "dv = " << dv << "\n";
 
-             /*   if(std::isnan(dv)) {
+                if(std::isnan(dv)) {
                     std::cout << "limits = [" << limits.min << ", " << limits.max << "], dv = " << result.dv << std::endl;
                     std::cout << "steps = " << stats.steps << ", evals = " << stats.evals << std::endl;
                     exit(-1);
-                }*/
+                }
 
                 // Store the correctly transformed results of the step, if desired
                 //  TODO: IT MAKES SENSE TO CONSIDER INTERPOLATION HERE....
@@ -238,9 +255,14 @@ class Integrator
 
                 // Update the integration variable limits
                 limits = limiter(dv, v);
+            }*/
+            auto state = initializeLoopState(funcs, v0, y0, transformer);
+
+            while(!end(state.dv, state.v, state.y, state.stats, state.limits)) {
+              state = loopIteration(state, funcs, store, limiter, transformer);
             }
 
-            return results;
+            return state.results;
         }
 
         //
@@ -253,4 +275,3 @@ class Integrator
 } /*namespace epode*/
 
 #endif // INTEGRATOR
-

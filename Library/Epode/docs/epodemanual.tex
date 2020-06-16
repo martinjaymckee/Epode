@@ -11,6 +11,7 @@
 \usepackage{xcolor}
 \usepackage{textcomp} % for angle brackets....
 \newcommand{\deemph}[1]{{\color{black!40}#1}}
+\newcommand{\identifier}[1]{{\color{blue!60}#1}}
 
 \title{Epode: Reference Manual}
 \author{Martin Jay McKee\\martinjaymckee@gmail.com}
@@ -50,10 +51,10 @@
 \index{All}\index{Apple}\index{Ball}\index{Cherry}\index{ODE}\index{Method}\index{Zoo}
 
     \section{Installation}
-      Because of its header-only nature, there is no specific need to install \epode{}.  One has the option to treat it as a local library and to simply include the files in the project tree of a new application.  This has the advantage that \epode{} version differences can easily be ignored.  The two main disadvantage of this is that, first, it may necessitate writing code to different versions of the library and, second, as a result of keeping to the newest version of the library, bugfixes that are applied to the mainline code will not be available to an application.  The suggestion is, then, to use keep a current version of \epode{} and use it for all development.  While this may require API updates in code at the moment (the \epode{} API is not yet stable), it guarantees that the most effective code is available at all times.   
+      Because of its header-only nature, there is no specific need to install \epode{}.  One has the option to treat it as a local library and to simply include the files in the project tree of a new application.  This has the advantage that \epode{} version differences can easily be ignored.  The two main disadvantage of this is that, first, it may necessitate writing code to different versions of the library and, second, as a result of keeping to the newest version of the library, bugfixes that are applied to the mainline code will not be available to an application - as \epode{} is a small library, its header-only nature has very little effect on compile times.  The suggested version of \epode{} is always the most current version.  While this may require API updates in code at the moment (the \epode{} API is not yet stable), it guarantees that the most effective code is available at all times.   
 
     \section{A Boring Example}
-      Let's take a look at what an \epode{} program might look like.  It's important to realize that this example is not a particularly useful one.  It is designed to demonstrate the simplified API -- using the solve function.  Additionally, the system of equations was not designed to solve any specific problem but, rather, to demonstrate a system of moderate complexity.  A complete program may look like the following:
+      Let's take a look at what an \epode{} program might look like.  It's important to realize that this example is not a particularly useful one.  It is designed to demonstrate the simplified API -- using the \identifier{solve} function.  Additionally, the system of equations was not designed to solve any specific problem but, rather, to demonstrate a system of mild complexity.  A complete program may look like the following:
   \begin{listing}
     \label{lst:basic}
     \caption{This is how to create and run a solver, then print the results}  
@@ -87,17 +88,21 @@
   \chapter{User API}
     TALK ABOUT THE PARTS OF THE LIBRARY... INTRODUCE THE SECTIONS
 
-    \section{The ``solve'' Function}
+    \section{The \identifier{solve} Function}
       The function \epodeinline{solve(...)} is syntactic sugar for a number of steps to develop an Epode solver and run it.  Still, for simple uses of \epode{}, it should be fully sufficient.
       
     \section{Integrator Engine}
       The integrator engine is the object that contains the implementation of the method ``stepping'', as well as storage of the integration results.
+      \subsection{Automatic Loop}
+      	THIS IS THE DEFAULT WAY TO INTEGRATE AND IS THE WAY THAT SHOULD BE USED UNLESS IT IS NECESSARY TO DO SPECIFIC WORK AT EACH TIME STEP.
+	\subsection{Manual Loop}
+	THIS IS THE WAY TO INTEGRATE IF SPECIFIC WORK AT EACH TIME STEP IS REQUIRED.  IT IS ALSO THE WAY THAT AUTOMATIC LOOPING IS IMPLEMENTED....
       
     \section{Methods}
       \epode{} provides a number of integration methods, all the way from the $1^{st}$ order Euler's method up to the ?? method with adaptive stepping.  These methods can be selected explicitly by the user either when using the basic ``solve'' function or when constructing an integration flow directly.
       
     \section{Trigger Objects}
-      In the \epode{} library, Several functions of the integration are controlled by - so called - trigger objects.
+      In the \epode{} library, several functions of the integration are controlled by - so called - trigger objects.
       
       IF THE ``END'' VALUE(S) (IS/ARE) BEFORE THE ``START'' VALUE, CONFIGURE THE TRIGGER OBJECT, LIMITER AND INTEGRATOR TO RUN BACKWARDS IN TIME.
 
@@ -252,7 +257,7 @@
 
     
       \subsection{RKF4(5)}
-	Introduced by Fehlberg in \cite{fehlberg1969low}, the RKF 4(5) method has been used as the default method\footnote{In some cases, related $4^{th}$/$5^{th}$ order methods like the Cash-Karp 4(5) or the Dormand-Prince 4(5) method has been used.  In any case, the RKF 4(5) method is important as representing a very good blend of accuracy and speed in problem-space of ode integration.} in a variety of ODE solvers since it's introduction in the late sixties.  The method has an amortiezed cost of six function evaluations per step and an error of order four.  The method is described by the Butcher's tableau,
+	Introduced by Fehlberg in \cite{fehlberg1969low}, the RKF 4(5) method has been used as the default method\footnote{In some cases, related $4^{th}$/    	Fehlberg's 4(5)\\$5^{th}$ order methods like the Cash-Karp 4(5) or the Dormand-Prince 4(5) method has been used.  In any case, the RKF 4(5) method is important as representing a very good blend of accuracy and speed in problem-space of ode integration.} in a variety of ODE solvers since it's introduction in the late sixties.  The method has an amortiezed cost of six function evaluations per step and an error of order four.  The method is described by the Butcher's tableau,
 	\[
 	  \begin{array}{c|cccc}
 	    0 & & & &\\
@@ -273,7 +278,24 @@
       \subsection{Butcher's 5th}
 	\srcas{Butchers}
     
-    
+    \subsection{Methods to Add}
+    From http://www.mymathlib.com/diffeq/embedded_runge_kutta/
+    	Fehlberg's 3(4)\\
+    	Fehlberg's 4(5)\\
+    	Fehlberg's 5(6)\\
+    	Fehlberg's 5(6)\\  
+    	
+	Verner's 5(6)\\	
+    	Verner's 6(7)\\
+    	Verner's 7(8)\\
+    	Verner's 8(9)\\  
+
+    	Prince-Dormand's 4(5) v1\\
+    	Prince-Dormand's 4(5) v2\\
+    	Prince-Dormand's 4(5) v3\\    
+    	
+    	Dormand-Prince 8(5,3) -- dopri853\\	    	    	  	   
+    	    	  	    
     %\section{Implicit Methods}
 
   \chapter{The Integrator Process}
