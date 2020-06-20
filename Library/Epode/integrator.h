@@ -151,10 +151,8 @@ class Integrator
 			return state;
 		}
 
-    template<typename Results, typename Funcs, typename Storer, typename Limiter, typename Transformer>
-    auto loopIteration ( IntegratorLoopState<Results> _state, Funcs funcs, Storer _store, Limiter _limiter, Transformer _transformer) {
-		auto f0 = std::get<0>(funcs);
-
+    template<typename Results, typename DerivFunc, typename Storer, typename Limiter, typename Transformer>
+    auto loopIteration ( IntegratorLoopState<Results> _state, DerivFunc f0, Storer _store, Limiter _limiter, Transformer _transformer) {
 		// Always constrain the integration variable step
 		_state.dv = _state.limits.constrain(_state.dv);
 
@@ -256,10 +254,12 @@ class Integrator
                 // Update the integration variable limits
                 limits = limiter(dv, v);
             }*/
+			auto f0 = std::get<0>(funcs);
+
             auto state = initializeLoopState(funcs, v0, y0, transformer);
 
             while(!end(state.dv, state.v, state.y, state.stats, state.limits)) {
-              state = loopIteration(state, funcs, store, limiter, transformer);
+              state = loopIteration(state, f0, store, limiter, transformer);
             }
 
             return state.results;

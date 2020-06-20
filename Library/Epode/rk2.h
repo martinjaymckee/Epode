@@ -63,7 +63,13 @@ template<typename Value, size_t N>
 class Heuns : public GenericRK2<Value, N>
 {
     public:
-        Heuns() : GenericRK2<Value, N>(Value(1)) {}
+		Heuns() : GenericRK2<Value, N>(Value(1)) {}
+		// TODO: THIS WOULD BE BETTER TO SIMPLY DEFAULT LIKE THIS...
+		//Heuns<Value, N>& operator =(const Heuns<Value, N>& _src) = default;
+		// IT ISN'T WORKING THOUGH, AS IT IS STILL TREATING THE FUNCTION AS DELETED
+		// AS SUCH, IT IS NECESSARY TO DEFINE AN EMPTY VERSION IN THIS, MIDPOINT, AND RALSTON
+		// THIS SHOULD BE FIXED....
+		Heuns& operator =(const Heuns&) { return *this; }
 };
 
 //  Explicit Midpoint Method, eta = 1/2
@@ -72,6 +78,7 @@ class Midpoint : public GenericRK2<Value, N>
 {
     public:
         Midpoint() : GenericRK2<Value, N>(Value(1)/Value(2)) {}
+		Midpoint& operator =(const Midpoint&) { return* this; }
 };
 
 //  Ralston's Method, eta = 2/3
@@ -80,6 +87,7 @@ class Ralstons : public GenericRK2<Value, N>
 {
     public:
         Ralstons() : GenericRK2<Value, N>(Value(2)/Value(3)) {}
+		Ralstons& operator = (const Ralstons&) { return *this; }
 };
 
 } /*namespace method*/

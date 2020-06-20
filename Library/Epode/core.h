@@ -41,6 +41,7 @@ struct StateProperties {
         static constexpr size_t N = static_cast<size_t>(_N);
 };
 
+
 template<typename Value, int N, int _Options, int _MaxRows, int _MaxCols>
 constexpr auto stateProperties(const Eigen::Matrix<Value, 1, N, _Options, _MaxRows, _MaxCols>&) {
     return StateProperties<Value, N>{};
@@ -48,7 +49,7 @@ constexpr auto stateProperties(const Eigen::Matrix<Value, 1, N, _Options, _MaxRo
 
 template<typename Value, int N, int _Options, int _MaxRows, int _MaxCols>
 constexpr auto stateProperties(Eigen::Matrix<Value, 1, N, _Options, _MaxRows, _MaxCols>&) {
-    return StateProperties<Value, N>{};
+	return StateProperties<Value, N>{};
 }
 
 // NOTE: THE FINAL THREE PARAMETERS IN THE STATEPROPERTIES FUNCTION
